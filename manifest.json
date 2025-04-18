@@ -1,0 +1,14 @@
+{
+  "manifest_version": 2,
+  "name": "CCH",
+  "version": "1.0",
+
+  "description": "Handles client side consent handshake",
+
+  "homepage_url": "https://github.com/TiagoPR/cch",
+
+  "icons": {
+    "48": "icons/handshake_48_2.png"
+  }
+}
+
