@@ -1,0 +1,918 @@
+<fieldset class="mb-2 border rounded-lg overflow-hidden bg-white/25 border-gray-400/25 dark:border-zinc-950/25 dark:bg-zinc-950/25" x-data="{category: 'essential', open: false}">
+<legend class="sr-only">Essential</legend>
+<div :class="{ 'border-b border-gray-400/25 dark:border-zinc-950/25': open }" @click="if (!$event.target.closest(&quot;.toggle&quot;)) { open = !open }" class="toggle-details px-4 py-2 select-none category-details-toggle bg-gray-300/25 hover:bg-gray-200/75 dark:bg-zinc-950/25 dark:hover:bg-zinc-950/25 cursor-pointer">
+<div class="flex items-center justify-between w-full flex-row">
+<span class="text-body-heading" id="essential-label">
+<div class="label select-none m-0 cursor-pointer">
+<div class="flex items-center justify-between text-body-heading flex-row">
+<div class="icon mr-1 sm:mr-2">
+<svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" x-show="!open">
+<path clip-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" fill-rule="evenodd"></path>
+</svg>
+<svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" x-show="open" style="display: none;">
+<path clip-rule="evenodd" d="M14.78 12.79a.75.75 0 01-1.06-.02L10 8.832l-3.71 3.938a.75.75 0 01-1.08-1.04l4.25-4.5a.75.75 0 011.08 0l4.25 4.5a.75.75 0 01-.02 1.06z" fill-rule="evenodd"></path>
+</svg>
+</div>
+<span class="m-0 font-bold text-body-heading">Essential</span>
+</div>
+</div>
+
+</span>
+<div x-show="true" x-data="{ 
+  enabled: true, 
+  readOnly: true
+}" x-init="
+  $watch('enabled', value => {
+    $refs.input.checked = value;
+    $refs.input.dispatchEvent(new Event('change'));
+  });
+" class="select-none flex items-center flex-row">
+  <label for="essential" class="sr-only">Essential</label>
+  <input type="checkbox" id="essential" name="essential" value="true" x-ref="input" x-model="enabled" readonly="true" disabled="true" data-type="category" data-category="essential" class="hidden category">
+
+  <span class="text-xs text-gray-500 font-medium bg-white/75 ring-1 ring-gray-200 px-2 py-0.5 mx-2 rounded dark:bg-zinc-900/50 dark:text-gray-300 dark:ring-zinc-950/75 whitespace-nowrap" x-show="readOnly &amp;&amp; enabled">Always enabled</span>
+
+  <button type="button" @click="if (!readOnly) enabled = !enabled" :class="{ 'bg-primary-bg': enabled || readOnly, 'bg-gray-400/75 dark:bg-zinc-400/75': !enabled &amp;&amp; !readOnly, 'cursor-not-allowed': readOnly, 'cursor-pointer': !readOnly }" class="toggle relative inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-bg focus:ring-offset-2 bg-primary-bg cursor-not-allowed" role="switch" :aria-checked="enabled.toString()" aria-checked="true">
+    <span class="sr-only">Enable</span>
+    <span :class="{ 'translate-x-5': enabled, 'translate-x-0': !enabled }" class="pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white dark:bg-black shadow ring-0 transition duration-200 ease-in-out translate-x-5">
+      <span :class="{ 'opacity-0 duration-100 ease-out': enabled, 'opacity-100 duration-200 ease-in': !enabled }" class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity opacity-0 duration-100 ease-out" aria-hidden="true">
+        <svg class="h-3 w-3 text-gray-300 dark:text-zinc-400" fill="none" viewBox="0 0 12 12">
+          <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </span>
+      <span :class="{ 'opacity-100 duration-200 ease-in': enabled, 'opacity-0 duration-100 ease-out': !enabled }" class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity opacity-100 duration-200 ease-in" aria-hidden="true">
+        <svg class="h-3 w-3 text-primary-bg" fill="currentColor" viewBox="0 0 12 12">
+          <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z"></path>
+        </svg>
+      </span>
+    </span>
+  </button>
+</div>
+
+</div>
+</div>
+<div class="category-details more-details" x-collapse.duration.200ms="true" x-show="open" style="display: none; height: 0px; overflow: hidden;" hidden="">
+<div class="px-4 py-2">
+<p class="text-sm text-gray-500 mt-1 text-pretty dark:text-gray-300" dir="auto">Essential cookies are necessary for features that are essential to your use of our site or services, such as account login, authentication and site security.</p>
+</div>
+<fieldset class="px-4 py-2" x-show="true">
+<legend class="sr-only">CookieChimp</legend>
+<div @click="if (!$event.target.closest(&quot;.toggle&quot;)) { open = !open }" class="toggle-details service-wrapper border rounded-lg px-2 sm:px-4 py-2 my-2 select-none hover:bg-gray-50/25 border-gray-400/25 dark:border-zinc-950/25 dark:hover:bg-zinc-950/25 cursor-pointer" x-data="{open: false}">
+<div class="flex items-center justify-between w-full flex-row">
+<div class="label select-none m-0 cursor-pointer">
+<div class="flex items-center justify-between text-body-heading flex-row">
+<div class="icon mr-1 sm:mr-2">
+<svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" x-show="!open">
+<path clip-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" fill-rule="evenodd"></path>
+</svg>
+<svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" x-show="open" style="display: none;">
+<path clip-rule="evenodd" d="M14.78 12.79a.75.75 0 01-1.06-.02L10 8.832l-3.71 3.938a.75.75 0 01-1.08-1.04l4.25-4.5a.75.75 0 011.08 0l4.25 4.5a.75.75 0 01-.02 1.06z" fill-rule="evenodd"></path>
+</svg>
+</div>
+<span class="m-0 font-bold text-body-heading">CookieChimp</span>
+</div>
+</div>
+
+<div x-show="true" x-data="{ 
+  enabled: true, 
+  readOnly: true
+}" x-init="
+  $watch('enabled', value => {
+    $refs.input.checked = value;
+    $refs.input.dispatchEvent(new Event('change'));
+  });
+" class="select-none flex items-center flex-row">
+  <label for="CookieChimp" class="sr-only">Essential</label>
+  <input type="checkbox" id="CookieChimp" name="essential[CookieChimp]" value="true" x-ref="input" x-model="enabled" readonly="true" disabled="true" data-type="service" data-category="essential" class="hidden service">
+
+  <span class="text-xs text-gray-500 font-medium bg-white/75 ring-1 ring-gray-200 px-2 py-0.5 mx-2 rounded dark:bg-zinc-900/50 dark:text-gray-300 dark:ring-zinc-950/75 whitespace-nowrap" x-show="readOnly &amp;&amp; enabled">Always enabled</span>
+
+  <button type="button" @click="if (!readOnly) enabled = !enabled" :class="{ 'bg-primary-bg': enabled || readOnly, 'bg-gray-400/75 dark:bg-zinc-400/75': !enabled &amp;&amp; !readOnly, 'cursor-not-allowed': readOnly, 'cursor-pointer': !readOnly }" class="toggle relative inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-bg focus:ring-offset-2 bg-primary-bg cursor-not-allowed" role="switch" :aria-checked="enabled.toString()" aria-checked="true">
+    <span class="sr-only">Enable</span>
+    <span :class="{ 'translate-x-5': enabled, 'translate-x-0': !enabled }" class="pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white dark:bg-black shadow ring-0 transition duration-200 ease-in-out translate-x-5">
+      <span :class="{ 'opacity-0 duration-100 ease-out': enabled, 'opacity-100 duration-200 ease-in': !enabled }" class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity opacity-0 duration-100 ease-out" aria-hidden="true">
+        <svg class="h-3 w-3 text-gray-300 dark:text-zinc-400" fill="none" viewBox="0 0 12 12">
+          <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </span>
+      <span :class="{ 'opacity-100 duration-200 ease-in': enabled, 'opacity-0 duration-100 ease-out': !enabled }" class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity opacity-100 duration-200 ease-in" aria-hidden="true">
+        <svg class="h-3 w-3 text-primary-bg" fill="currentColor" viewBox="0 0 12 12">
+          <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z"></path>
+        </svg>
+      </span>
+    </span>
+  </button>
+</div>
+
+</div>
+<div class="more-details" x-collapse.duration.200ms="true" x-show="open" style="display: none; height: 0px; overflow: hidden;" hidden="">
+<p class="text-sm text-gray-500 mt-2 text-pretty dark:text-gray-300" dir="auto">CookieChimp manages and stores user consent preferences, enabling the website to respect and apply your choices regarding data usage.</p>
+<div class="mt-4">
+<table class="table-fixed min-w-full divide-y first:divide-y-0 divide-gray-400/25 dark:divide-zinc-950/25" dir="auto">
+<thead>
+<tr class="text-gray-500 font-normal dark:text-gray-300">
+<th class="hidden px-3 pb-2 text-sm sm:table-cell pl-0 w-full text-left">
+Name
+</th>
+<th class="hidden px-3 pb-2 text-sm sm:table-cell w-[150px] text-left">
+Duration
+</th>
+<th class="hidden px-3 pb-2 text-sm sm:table-cell text-left">
+</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-400/25 dark:divide-zinc-950/25">
+<tr>
+<td class="sm:flex flex-row gap-2 py-2 pl-0 pr-3 text-sm font-medium text-gray-500 sm:w-auto sm:table-cell dark:text-gray-300 max-w-[200px]">
+<div class="sm:flex sm:items-center sm:gap-2">
+<div class="hidden sm:inline flex-shrink-0" data-controller="tooltip" data-tippy-content="Cookie">
+<svg fill="currentColor" height="16px" viewBox="0 0 32 32" width="16px" xmlns="http://www.w3.org/2000/svg">
+<path d="M 16 4 C 9.371094 4 4 9.371094 4 16 C 4 22.628906 9.371094 28 16 28 C 22.628906 28 28 22.628906 28 16 C 28 15.515625 27.964844 15.039063 27.90625 14.566406 C 27.507813 14.839844 27.023438 15 26.5 15 C 25.421875 15 24.511719 14.3125 24.160156 13.359375 C 23.535156 13.757813 22.796875 14 22 14 C 19.789063 14 18 12.210938 18 10 C 18 9.265625 18.210938 8.585938 18.558594 7.992188 C 18.539063 7.996094 18.519531 8 18.5 8 C 17.117188 8 16 6.882813 16 5.5 C 16 4.941406 16.1875 4.433594 16.496094 4.019531 C 16.332031 4.011719 16.167969 4 16 4 Z M 23.5 4 C 22.671875 4 22 4.671875 22 5.5 C 22 6.328125 22.671875 7 23.5 7 C 24.328125 7 25 6.328125 25 5.5 C 25 4.671875 24.328125 4 23.5 4 Z M 14.050781 6.1875 C 14.25 7.476563 15 8.585938 16.046875 9.273438 C 16.015625 9.511719 16 9.757813 16 10 C 16 13.308594 18.691406 16 22 16 C 22.496094 16 22.992188 15.9375 23.46875 15.8125 C 24.152344 16.4375 25.015625 16.851563 25.953125 16.96875 C 25.464844 22.03125 21.1875 26 16 26 C 10.484375 26 6 21.515625 6 16 C 6 11.152344 9.46875 7.097656 14.050781 6.1875 Z M 22 9 C 21.449219 9 21 9.449219 21 10 C 21 10.550781 21.449219 11 22 11 C 22.550781 11 23 10.550781 23 10 C 23 9.449219 22.550781 9 22 9 Z M 14 10 C 13.449219 10 13 10.449219 13 11 C 13 11.550781 13.449219 12 14 12 C 14.550781 12 15 11.550781 15 11 C 15 10.449219 14.550781 10 14 10 Z M 27 10 C 26.449219 10 26 10.449219 26 11 C 26 11.550781 26.449219 12 27 12 C 27.550781 12 28 11.550781 28 11 C 28 10.449219 27.550781 10 27 10 Z M 11 13 C 9.894531 13 9 13.894531 9 15 C 9 16.105469 9.894531 17 11 17 C 12.105469 17 13 16.105469 13 15 C 13 13.894531 12.105469 13 11 13 Z M 16 15 C 15.449219 15 15 15.449219 15 16 C 15 16.550781 15.449219 17 16 17 C 16.550781 17 17 16.550781 17 16 C 17 15.449219 16.550781 15 16 15 Z M 12.5 19 C 11.671875 19 11 19.671875 11 20.5 C 11 21.328125 11.671875 22 12.5 22 C 13.328125 22 14 21.328125 14 20.5 C 14 19.671875 13.328125 19 12.5 19 Z M 19.5 20 C 18.671875 20 18 20.671875 18 21.5 C 18 22.328125 18.671875 23 19.5 23 C 20.328125 23 21 22.328125 21 21.5 C 21 20.671875 20.328125 20 19.5 20 Z"></path>
+</svg>
+</div>
+<div class="mb-4 mt-1 sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 mb-1 font-bold">Name</div>
+<div class="break-words">cookiechimp_pref_*</div>
+</div>
+<div class="hidden sm:inline truncate" data-controller="tooltip" data-tippy-content="cookiechimp_pref_*">
+cookiechimp_pref_*
+</div>
+</div>
+<div class="mb-4 mt-1 font-normal sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 font-bold">Type</div>
+<div class="mt-1 text-gray-500 dark:text-gray-300">Cookie</div>
+</div>
+<dl class="mt-2 font-normal sm:hidden">
+<div class="mb-4 mt-1">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Description</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">Used to store the user's cookie consent preferences.</dd>
+</div>
+<div class="grid grid-cols-2 gap-2 mb-2">
+<div class="col">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Duration</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">6 months</dd>
+</div>
+</div>
+</dl>
+</td>
+<td class="hidden px-3 py-2 sm:table-cell truncate max-w-[100px]">
+<div class="text-sm text-gray-500 dark:text-gray-300 inline" data-controller="tooltip" data-tippy-content="6 months">6 months</div>
+</td>
+<td class="hidden px-3 py-2 text-sm text-gray-500 dark:text-gray-300 sm:table-cell max-w-[300px]">
+<div class="w-fit" data-controller="tooltip" data-tippy-content="<div dir='auto'>Used to store the user's cookie consent preferences.</div>" data-tippy-placement="left">
+<svg aria-hidden="true" class="w-5 h-5 text-gray-400" fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</td>
+</tr>
+<tr>
+<td class="sm:flex flex-row gap-2 py-2 pl-0 pr-3 text-sm font-medium text-gray-500 sm:w-auto sm:table-cell dark:text-gray-300 max-w-[200px]">
+<div class="sm:flex sm:items-center sm:gap-2">
+<div class="hidden sm:inline flex-shrink-0" data-controller="tooltip" data-tippy-content="Cookie">
+<svg fill="currentColor" height="16px" viewBox="0 0 32 32" width="16px" xmlns="http://www.w3.org/2000/svg">
+<path d="M 16 4 C 9.371094 4 4 9.371094 4 16 C 4 22.628906 9.371094 28 16 28 C 22.628906 28 28 22.628906 28 16 C 28 15.515625 27.964844 15.039063 27.90625 14.566406 C 27.507813 14.839844 27.023438 15 26.5 15 C 25.421875 15 24.511719 14.3125 24.160156 13.359375 C 23.535156 13.757813 22.796875 14 22 14 C 19.789063 14 18 12.210938 18 10 C 18 9.265625 18.210938 8.585938 18.558594 7.992188 C 18.539063 7.996094 18.519531 8 18.5 8 C 17.117188 8 16 6.882813 16 5.5 C 16 4.941406 16.1875 4.433594 16.496094 4.019531 C 16.332031 4.011719 16.167969 4 16 4 Z M 23.5 4 C 22.671875 4 22 4.671875 22 5.5 C 22 6.328125 22.671875 7 23.5 7 C 24.328125 7 25 6.328125 25 5.5 C 25 4.671875 24.328125 4 23.5 4 Z M 14.050781 6.1875 C 14.25 7.476563 15 8.585938 16.046875 9.273438 C 16.015625 9.511719 16 9.757813 16 10 C 16 13.308594 18.691406 16 22 16 C 22.496094 16 22.992188 15.9375 23.46875 15.8125 C 24.152344 16.4375 25.015625 16.851563 25.953125 16.96875 C 25.464844 22.03125 21.1875 26 16 26 C 10.484375 26 6 21.515625 6 16 C 6 11.152344 9.46875 7.097656 14.050781 6.1875 Z M 22 9 C 21.449219 9 21 9.449219 21 10 C 21 10.550781 21.449219 11 22 11 C 22.550781 11 23 10.550781 23 10 C 23 9.449219 22.550781 9 22 9 Z M 14 10 C 13.449219 10 13 10.449219 13 11 C 13 11.550781 13.449219 12 14 12 C 14.550781 12 15 11.550781 15 11 C 15 10.449219 14.550781 10 14 10 Z M 27 10 C 26.449219 10 26 10.449219 26 11 C 26 11.550781 26.449219 12 27 12 C 27.550781 12 28 11.550781 28 11 C 28 10.449219 27.550781 10 27 10 Z M 11 13 C 9.894531 13 9 13.894531 9 15 C 9 16.105469 9.894531 17 11 17 C 12.105469 17 13 16.105469 13 15 C 13 13.894531 12.105469 13 11 13 Z M 16 15 C 15.449219 15 15 15.449219 15 16 C 15 16.550781 15.449219 17 16 17 C 16.550781 17 17 16.550781 17 16 C 17 15.449219 16.550781 15 16 15 Z M 12.5 19 C 11.671875 19 11 19.671875 11 20.5 C 11 21.328125 11.671875 22 12.5 22 C 13.328125 22 14 21.328125 14 20.5 C 14 19.671875 13.328125 19 12.5 19 Z M 19.5 20 C 18.671875 20 18 20.671875 18 21.5 C 18 22.328125 18.671875 23 19.5 23 C 20.328125 23 21 22.328125 21 21.5 C 21 20.671875 20.328125 20 19.5 20 Z"></path>
+</svg>
+</div>
+<div class="mb-4 mt-1 sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 mb-1 font-bold">Name</div>
+<div class="break-words">cookiechimp_uuid</div>
+</div>
+<div class="hidden sm:inline truncate" data-controller="tooltip" data-tippy-content="cookiechimp_uuid">
+cookiechimp_uuid
+</div>
+</div>
+<div class="mb-4 mt-1 font-normal sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 font-bold">Type</div>
+<div class="mt-1 text-gray-500 dark:text-gray-300">Cookie</div>
+</div>
+<dl class="mt-2 font-normal sm:hidden">
+<div class="mb-4 mt-1">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Description</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">Used to identify unique site visitors.</dd>
+</div>
+<div class="grid grid-cols-2 gap-2 mb-2">
+<div class="col">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Duration</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">Session</dd>
+</div>
+</div>
+</dl>
+</td>
+<td class="hidden px-3 py-2 sm:table-cell truncate max-w-[100px]">
+<div class="text-sm text-gray-500 dark:text-gray-300 inline" data-controller="tooltip" data-tippy-content="Session">Session</div>
+</td>
+<td class="hidden px-3 py-2 text-sm text-gray-500 dark:text-gray-300 sm:table-cell max-w-[300px]">
+<div class="w-fit" data-controller="tooltip" data-tippy-content="<div dir='auto'>Used to identify unique site visitors.</div>" data-tippy-placement="left">
+<svg aria-hidden="true" class="w-5 h-5 text-gray-400" fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<legend class="sr-only">WordPress</legend>
+<div @click="if (!$event.target.closest(&quot;.toggle&quot;)) { open = !open }" class="toggle-details service-wrapper border rounded-lg px-2 sm:px-4 py-2 my-2 select-none hover:bg-gray-50/25 border-gray-400/25 dark:border-zinc-950/25 dark:hover:bg-zinc-950/25 cursor-pointer" x-data="{open: false}">
+<div class="flex items-center justify-between w-full flex-row">
+<div class="label select-none m-0 cursor-pointer">
+<div class="flex items-center justify-between text-body-heading flex-row">
+<div class="icon mr-1 sm:mr-2">
+<svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" x-show="!open">
+<path clip-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" fill-rule="evenodd"></path>
+</svg>
+<svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" x-show="open" style="display: none;">
+<path clip-rule="evenodd" d="M14.78 12.79a.75.75 0 01-1.06-.02L10 8.832l-3.71 3.938a.75.75 0 01-1.08-1.04l4.25-4.5a.75.75 0 011.08 0l4.25 4.5a.75.75 0 01-.02 1.06z" fill-rule="evenodd"></path>
+</svg>
+</div>
+<span class="m-0 font-bold text-body-heading">WordPress</span>
+</div>
+</div>
+
+<div x-show="true" x-data="{ 
+  enabled: true, 
+  readOnly: true
+}" x-init="
+  $watch('enabled', value => {
+    $refs.input.checked = value;
+    $refs.input.dispatchEvent(new Event('change'));
+  });
+" class="select-none flex items-center flex-row">
+  <label for="WordPress" class="sr-only">Essential</label>
+  <input type="checkbox" id="WordPress" name="essential[WordPress]" value="true" x-ref="input" x-model="enabled" readonly="true" disabled="true" data-type="service" data-category="essential" class="hidden service">
+
+  <span class="text-xs text-gray-500 font-medium bg-white/75 ring-1 ring-gray-200 px-2 py-0.5 mx-2 rounded dark:bg-zinc-900/50 dark:text-gray-300 dark:ring-zinc-950/75 whitespace-nowrap" x-show="readOnly &amp;&amp; enabled">Always enabled</span>
+
+  <button type="button" @click="if (!readOnly) enabled = !enabled" :class="{ 'bg-primary-bg': enabled || readOnly, 'bg-gray-400/75 dark:bg-zinc-400/75': !enabled &amp;&amp; !readOnly, 'cursor-not-allowed': readOnly, 'cursor-pointer': !readOnly }" class="toggle relative inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-bg focus:ring-offset-2 bg-primary-bg cursor-not-allowed" role="switch" :aria-checked="enabled.toString()" aria-checked="true">
+    <span class="sr-only">Enable</span>
+    <span :class="{ 'translate-x-5': enabled, 'translate-x-0': !enabled }" class="pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white dark:bg-black shadow ring-0 transition duration-200 ease-in-out translate-x-5">
+      <span :class="{ 'opacity-0 duration-100 ease-out': enabled, 'opacity-100 duration-200 ease-in': !enabled }" class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity opacity-0 duration-100 ease-out" aria-hidden="true">
+        <svg class="h-3 w-3 text-gray-300 dark:text-zinc-400" fill="none" viewBox="0 0 12 12">
+          <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </span>
+      <span :class="{ 'opacity-100 duration-200 ease-in': enabled, 'opacity-0 duration-100 ease-out': !enabled }" class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity opacity-100 duration-200 ease-in" aria-hidden="true">
+        <svg class="h-3 w-3 text-primary-bg" fill="currentColor" viewBox="0 0 12 12">
+          <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z"></path>
+        </svg>
+      </span>
+    </span>
+  </button>
+</div>
+
+</div>
+<div class="more-details" x-collapse.duration.200ms="true" x-show="open" style="display: none; height: 0px; overflow: hidden;" hidden="">
+<p class="text-sm text-gray-500 mt-2 text-pretty dark:text-gray-300" dir="auto">We use WordPress to manage our website content. Various cookies are used to manage user sessions, preferences, and authentication.</p>
+<p class="text-sm text-gray-500 mt-2 text-pretty dark:text-gray-300" dir="auto">
+<a target="_blank" class="text-gray-500 dark:text-gray-300 font-medium underline underline-offset-4 hover:decoration-2 hover:text-gray-700 dark:hover:text-body-heading focus:text-gray-700 dark:focus:text-gray-100" href="https://automattic.com/privacy/">Privacy Policy
+<span>→</span>
+</a></p>
+<div class="mt-4">
+<table class="table-fixed min-w-full divide-y first:divide-y-0 divide-gray-400/25 dark:divide-zinc-950/25" dir="auto">
+<thead>
+<tr class="text-gray-500 font-normal dark:text-gray-300">
+<th class="hidden px-3 pb-2 text-sm sm:table-cell pl-0 w-full text-left">
+Name
+</th>
+<th class="hidden px-3 pb-2 text-sm sm:table-cell w-[150px] text-left">
+Duration
+</th>
+<th class="hidden px-3 pb-2 text-sm sm:table-cell text-left">
+</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-400/25 dark:divide-zinc-950/25">
+<tr>
+<td class="sm:flex flex-row gap-2 py-2 pl-0 pr-3 text-sm font-medium text-gray-500 sm:w-auto sm:table-cell dark:text-gray-300 max-w-[200px]">
+<div class="sm:flex sm:items-center sm:gap-2">
+<div class="hidden sm:inline flex-shrink-0" data-controller="tooltip" data-tippy-content="Cookie">
+<svg fill="currentColor" height="16px" viewBox="0 0 32 32" width="16px" xmlns="http://www.w3.org/2000/svg">
+<path d="M 16 4 C 9.371094 4 4 9.371094 4 16 C 4 22.628906 9.371094 28 16 28 C 22.628906 28 28 22.628906 28 16 C 28 15.515625 27.964844 15.039063 27.90625 14.566406 C 27.507813 14.839844 27.023438 15 26.5 15 C 25.421875 15 24.511719 14.3125 24.160156 13.359375 C 23.535156 13.757813 22.796875 14 22 14 C 19.789063 14 18 12.210938 18 10 C 18 9.265625 18.210938 8.585938 18.558594 7.992188 C 18.539063 7.996094 18.519531 8 18.5 8 C 17.117188 8 16 6.882813 16 5.5 C 16 4.941406 16.1875 4.433594 16.496094 4.019531 C 16.332031 4.011719 16.167969 4 16 4 Z M 23.5 4 C 22.671875 4 22 4.671875 22 5.5 C 22 6.328125 22.671875 7 23.5 7 C 24.328125 7 25 6.328125 25 5.5 C 25 4.671875 24.328125 4 23.5 4 Z M 14.050781 6.1875 C 14.25 7.476563 15 8.585938 16.046875 9.273438 C 16.015625 9.511719 16 9.757813 16 10 C 16 13.308594 18.691406 16 22 16 C 22.496094 16 22.992188 15.9375 23.46875 15.8125 C 24.152344 16.4375 25.015625 16.851563 25.953125 16.96875 C 25.464844 22.03125 21.1875 26 16 26 C 10.484375 26 6 21.515625 6 16 C 6 11.152344 9.46875 7.097656 14.050781 6.1875 Z M 22 9 C 21.449219 9 21 9.449219 21 10 C 21 10.550781 21.449219 11 22 11 C 22.550781 11 23 10.550781 23 10 C 23 9.449219 22.550781 9 22 9 Z M 14 10 C 13.449219 10 13 10.449219 13 11 C 13 11.550781 13.449219 12 14 12 C 14.550781 12 15 11.550781 15 11 C 15 10.449219 14.550781 10 14 10 Z M 27 10 C 26.449219 10 26 10.449219 26 11 C 26 11.550781 26.449219 12 27 12 C 27.550781 12 28 11.550781 28 11 C 28 10.449219 27.550781 10 27 10 Z M 11 13 C 9.894531 13 9 13.894531 9 15 C 9 16.105469 9.894531 17 11 17 C 12.105469 17 13 16.105469 13 15 C 13 13.894531 12.105469 13 11 13 Z M 16 15 C 15.449219 15 15 15.449219 15 16 C 15 16.550781 15.449219 17 16 17 C 16.550781 17 17 16.550781 17 16 C 17 15.449219 16.550781 15 16 15 Z M 12.5 19 C 11.671875 19 11 19.671875 11 20.5 C 11 21.328125 11.671875 22 12.5 22 C 13.328125 22 14 21.328125 14 20.5 C 14 19.671875 13.328125 19 12.5 19 Z M 19.5 20 C 18.671875 20 18 20.671875 18 21.5 C 18 22.328125 18.671875 23 19.5 23 C 20.328125 23 21 22.328125 21 21.5 C 21 20.671875 20.328125 20 19.5 20 Z"></path>
+</svg>
+</div>
+<div class="mb-4 mt-1 sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 mb-1 font-bold">Name</div>
+<div class="break-words">WordPress-*</div>
+</div>
+<div class="hidden sm:inline truncate" data-controller="tooltip" data-tippy-content="WordPress-*">
+WordPress-*
+</div>
+</div>
+<div class="mb-4 mt-1 font-normal sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 font-bold">Type</div>
+<div class="mt-1 text-gray-500 dark:text-gray-300">Cookie</div>
+</div>
+<dl class="mt-2 font-normal sm:hidden">
+<div class="mb-4 mt-1">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Description</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">Used to store authentication details.</dd>
+</div>
+<div class="grid grid-cols-2 gap-2 mb-2">
+<div class="col">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Duration</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">Session</dd>
+</div>
+</div>
+</dl>
+</td>
+<td class="hidden px-3 py-2 sm:table-cell truncate max-w-[100px]">
+<div class="text-sm text-gray-500 dark:text-gray-300 inline" data-controller="tooltip" data-tippy-content="Session">Session</div>
+</td>
+<td class="hidden px-3 py-2 text-sm text-gray-500 dark:text-gray-300 sm:table-cell max-w-[300px]">
+<div class="w-fit" data-controller="tooltip" data-tippy-content="<div dir='auto'>Used to store authentication details.</div>" data-tippy-placement="left">
+<svg aria-hidden="true" class="w-5 h-5 text-gray-400" fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</td>
+</tr>
+<tr>
+<td class="sm:flex flex-row gap-2 py-2 pl-0 pr-3 text-sm font-medium text-gray-500 sm:w-auto sm:table-cell dark:text-gray-300 max-w-[200px]">
+<div class="sm:flex sm:items-center sm:gap-2">
+<div class="hidden sm:inline flex-shrink-0" data-controller="tooltip" data-tippy-content="Cookie">
+<svg fill="currentColor" height="16px" viewBox="0 0 32 32" width="16px" xmlns="http://www.w3.org/2000/svg">
+<path d="M 16 4 C 9.371094 4 4 9.371094 4 16 C 4 22.628906 9.371094 28 16 28 C 22.628906 28 28 22.628906 28 16 C 28 15.515625 27.964844 15.039063 27.90625 14.566406 C 27.507813 14.839844 27.023438 15 26.5 15 C 25.421875 15 24.511719 14.3125 24.160156 13.359375 C 23.535156 13.757813 22.796875 14 22 14 C 19.789063 14 18 12.210938 18 10 C 18 9.265625 18.210938 8.585938 18.558594 7.992188 C 18.539063 7.996094 18.519531 8 18.5 8 C 17.117188 8 16 6.882813 16 5.5 C 16 4.941406 16.1875 4.433594 16.496094 4.019531 C 16.332031 4.011719 16.167969 4 16 4 Z M 23.5 4 C 22.671875 4 22 4.671875 22 5.5 C 22 6.328125 22.671875 7 23.5 7 C 24.328125 7 25 6.328125 25 5.5 C 25 4.671875 24.328125 4 23.5 4 Z M 14.050781 6.1875 C 14.25 7.476563 15 8.585938 16.046875 9.273438 C 16.015625 9.511719 16 9.757813 16 10 C 16 13.308594 18.691406 16 22 16 C 22.496094 16 22.992188 15.9375 23.46875 15.8125 C 24.152344 16.4375 25.015625 16.851563 25.953125 16.96875 C 25.464844 22.03125 21.1875 26 16 26 C 10.484375 26 6 21.515625 6 16 C 6 11.152344 9.46875 7.097656 14.050781 6.1875 Z M 22 9 C 21.449219 9 21 9.449219 21 10 C 21 10.550781 21.449219 11 22 11 C 22.550781 11 23 10.550781 23 10 C 23 9.449219 22.550781 9 22 9 Z M 14 10 C 13.449219 10 13 10.449219 13 11 C 13 11.550781 13.449219 12 14 12 C 14.550781 12 15 11.550781 15 11 C 15 10.449219 14.550781 10 14 10 Z M 27 10 C 26.449219 10 26 10.449219 26 11 C 26 11.550781 26.449219 12 27 12 C 27.550781 12 28 11.550781 28 11 C 28 10.449219 27.550781 10 27 10 Z M 11 13 C 9.894531 13 9 13.894531 9 15 C 9 16.105469 9.894531 17 11 17 C 12.105469 17 13 16.105469 13 15 C 13 13.894531 12.105469 13 11 13 Z M 16 15 C 15.449219 15 15 15.449219 15 16 C 15 16.550781 15.449219 17 16 17 C 16.550781 17 17 16.550781 17 16 C 17 15.449219 16.550781 15 16 15 Z M 12.5 19 C 11.671875 19 11 19.671875 11 20.5 C 11 21.328125 11.671875 22 12.5 22 C 13.328125 22 14 21.328125 14 20.5 C 14 19.671875 13.328125 19 12.5 19 Z M 19.5 20 C 18.671875 20 18 20.671875 18 21.5 C 18 22.328125 18.671875 23 19.5 23 C 20.328125 23 21 22.328125 21 21.5 C 21 20.671875 20.328125 20 19.5 20 Z"></path>
+</svg>
+</div>
+<div class="mb-4 mt-1 sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 mb-1 font-bold">Name</div>
+<div class="break-words">comment_author_*</div>
+</div>
+<div class="hidden sm:inline truncate" data-controller="tooltip" data-tippy-content="comment_author_*">
+comment_author_*
+</div>
+</div>
+<div class="mb-4 mt-1 font-normal sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 font-bold">Type</div>
+<div class="mt-1 text-gray-500 dark:text-gray-300">Cookie</div>
+</div>
+<dl class="mt-2 font-normal sm:hidden">
+<div class="mb-4 mt-1">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Description</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">Used to store the user's name and email address when they submit a comment.</dd>
+</div>
+<div class="grid grid-cols-2 gap-2 mb-2">
+<div class="col">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Duration</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">1 year</dd>
+</div>
+</div>
+</dl>
+</td>
+<td class="hidden px-3 py-2 sm:table-cell truncate max-w-[100px]">
+<div class="text-sm text-gray-500 dark:text-gray-300 inline" data-controller="tooltip" data-tippy-content="1 year">1 year</div>
+</td>
+<td class="hidden px-3 py-2 text-sm text-gray-500 dark:text-gray-300 sm:table-cell max-w-[300px]">
+<div class="w-fit" data-controller="tooltip" data-tippy-content="<div dir='auto'>Used to store the user's name and email address when they submit a comment.</div>" data-tippy-placement="left">
+<svg aria-hidden="true" class="w-5 h-5 text-gray-400" fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</td>
+</tr>
+<tr>
+<td class="sm:flex flex-row gap-2 py-2 pl-0 pr-3 text-sm font-medium text-gray-500 sm:w-auto sm:table-cell dark:text-gray-300 max-w-[200px]">
+<div class="sm:flex sm:items-center sm:gap-2">
+<div class="hidden sm:inline flex-shrink-0" data-controller="tooltip" data-tippy-content="Cookie">
+<svg fill="currentColor" height="16px" viewBox="0 0 32 32" width="16px" xmlns="http://www.w3.org/2000/svg">
+<path d="M 16 4 C 9.371094 4 4 9.371094 4 16 C 4 22.628906 9.371094 28 16 28 C 22.628906 28 28 22.628906 28 16 C 28 15.515625 27.964844 15.039063 27.90625 14.566406 C 27.507813 14.839844 27.023438 15 26.5 15 C 25.421875 15 24.511719 14.3125 24.160156 13.359375 C 23.535156 13.757813 22.796875 14 22 14 C 19.789063 14 18 12.210938 18 10 C 18 9.265625 18.210938 8.585938 18.558594 7.992188 C 18.539063 7.996094 18.519531 8 18.5 8 C 17.117188 8 16 6.882813 16 5.5 C 16 4.941406 16.1875 4.433594 16.496094 4.019531 C 16.332031 4.011719 16.167969 4 16 4 Z M 23.5 4 C 22.671875 4 22 4.671875 22 5.5 C 22 6.328125 22.671875 7 23.5 7 C 24.328125 7 25 6.328125 25 5.5 C 25 4.671875 24.328125 4 23.5 4 Z M 14.050781 6.1875 C 14.25 7.476563 15 8.585938 16.046875 9.273438 C 16.015625 9.511719 16 9.757813 16 10 C 16 13.308594 18.691406 16 22 16 C 22.496094 16 22.992188 15.9375 23.46875 15.8125 C 24.152344 16.4375 25.015625 16.851563 25.953125 16.96875 C 25.464844 22.03125 21.1875 26 16 26 C 10.484375 26 6 21.515625 6 16 C 6 11.152344 9.46875 7.097656 14.050781 6.1875 Z M 22 9 C 21.449219 9 21 9.449219 21 10 C 21 10.550781 21.449219 11 22 11 C 22.550781 11 23 10.550781 23 10 C 23 9.449219 22.550781 9 22 9 Z M 14 10 C 13.449219 10 13 10.449219 13 11 C 13 11.550781 13.449219 12 14 12 C 14.550781 12 15 11.550781 15 11 C 15 10.449219 14.550781 10 14 10 Z M 27 10 C 26.449219 10 26 10.449219 26 11 C 26 11.550781 26.449219 12 27 12 C 27.550781 12 28 11.550781 28 11 C 28 10.449219 27.550781 10 27 10 Z M 11 13 C 9.894531 13 9 13.894531 9 15 C 9 16.105469 9.894531 17 11 17 C 12.105469 17 13 16.105469 13 15 C 13 13.894531 12.105469 13 11 13 Z M 16 15 C 15.449219 15 15 15.449219 15 16 C 15 16.550781 15.449219 17 16 17 C 16.550781 17 17 16.550781 17 16 C 17 15.449219 16.550781 15 16 15 Z M 12.5 19 C 11.671875 19 11 19.671875 11 20.5 C 11 21.328125 11.671875 22 12.5 22 C 13.328125 22 14 21.328125 14 20.5 C 14 19.671875 13.328125 19 12.5 19 Z M 19.5 20 C 18.671875 20 18 20.671875 18 21.5 C 18 22.328125 18.671875 23 19.5 23 C 20.328125 23 21 22.328125 21 21.5 C 21 20.671875 20.328125 20 19.5 20 Z"></path>
+</svg>
+</div>
+<div class="mb-4 mt-1 sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 mb-1 font-bold">Name</div>
+<div class="break-words">wordpress_logged_in_*</div>
+</div>
+<div class="hidden sm:inline truncate" data-controller="tooltip" data-tippy-content="wordpress_logged_in_*">
+wordpress_logged_in_*
+</div>
+</div>
+<div class="mb-4 mt-1 font-normal sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 font-bold">Type</div>
+<div class="mt-1 text-gray-500 dark:text-gray-300">Cookie</div>
+</div>
+<dl class="mt-2 font-normal sm:hidden">
+<div class="mb-4 mt-1">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Description</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">Indicates when you're logged in, and who you are, for most interface use.</dd>
+</div>
+<div class="grid grid-cols-2 gap-2 mb-2">
+<div class="col">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Duration</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">Session</dd>
+</div>
+</div>
+</dl>
+</td>
+<td class="hidden px-3 py-2 sm:table-cell truncate max-w-[100px]">
+<div class="text-sm text-gray-500 dark:text-gray-300 inline" data-controller="tooltip" data-tippy-content="Session">Session</div>
+</td>
+<td class="hidden px-3 py-2 text-sm text-gray-500 dark:text-gray-300 sm:table-cell max-w-[300px]">
+<div class="w-fit" data-controller="tooltip" data-tippy-content="<div dir='auto'>Indicates when you're logged in, and who you are, for most interface use.</div>" data-tippy-placement="left">
+<svg aria-hidden="true" class="w-5 h-5 text-gray-400" fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</td>
+</tr>
+<tr>
+<td class="sm:flex flex-row gap-2 py-2 pl-0 pr-3 text-sm font-medium text-gray-500 sm:w-auto sm:table-cell dark:text-gray-300 max-w-[200px]">
+<div class="sm:flex sm:items-center sm:gap-2">
+<div class="hidden sm:inline flex-shrink-0" data-controller="tooltip" data-tippy-content="Cookie">
+<svg fill="currentColor" height="16px" viewBox="0 0 32 32" width="16px" xmlns="http://www.w3.org/2000/svg">
+<path d="M 16 4 C 9.371094 4 4 9.371094 4 16 C 4 22.628906 9.371094 28 16 28 C 22.628906 28 28 22.628906 28 16 C 28 15.515625 27.964844 15.039063 27.90625 14.566406 C 27.507813 14.839844 27.023438 15 26.5 15 C 25.421875 15 24.511719 14.3125 24.160156 13.359375 C 23.535156 13.757813 22.796875 14 22 14 C 19.789063 14 18 12.210938 18 10 C 18 9.265625 18.210938 8.585938 18.558594 7.992188 C 18.539063 7.996094 18.519531 8 18.5 8 C 17.117188 8 16 6.882813 16 5.5 C 16 4.941406 16.1875 4.433594 16.496094 4.019531 C 16.332031 4.011719 16.167969 4 16 4 Z M 23.5 4 C 22.671875 4 22 4.671875 22 5.5 C 22 6.328125 22.671875 7 23.5 7 C 24.328125 7 25 6.328125 25 5.5 C 25 4.671875 24.328125 4 23.5 4 Z M 14.050781 6.1875 C 14.25 7.476563 15 8.585938 16.046875 9.273438 C 16.015625 9.511719 16 9.757813 16 10 C 16 13.308594 18.691406 16 22 16 C 22.496094 16 22.992188 15.9375 23.46875 15.8125 C 24.152344 16.4375 25.015625 16.851563 25.953125 16.96875 C 25.464844 22.03125 21.1875 26 16 26 C 10.484375 26 6 21.515625 6 16 C 6 11.152344 9.46875 7.097656 14.050781 6.1875 Z M 22 9 C 21.449219 9 21 9.449219 21 10 C 21 10.550781 21.449219 11 22 11 C 22.550781 11 23 10.550781 23 10 C 23 9.449219 22.550781 9 22 9 Z M 14 10 C 13.449219 10 13 10.449219 13 11 C 13 11.550781 13.449219 12 14 12 C 14.550781 12 15 11.550781 15 11 C 15 10.449219 14.550781 10 14 10 Z M 27 10 C 26.449219 10 26 10.449219 26 11 C 26 11.550781 26.449219 12 27 12 C 27.550781 12 28 11.550781 28 11 C 28 10.449219 27.550781 10 27 10 Z M 11 13 C 9.894531 13 9 13.894531 9 15 C 9 16.105469 9.894531 17 11 17 C 12.105469 17 13 16.105469 13 15 C 13 13.894531 12.105469 13 11 13 Z M 16 15 C 15.449219 15 15 15.449219 15 16 C 15 16.550781 15.449219 17 16 17 C 16.550781 17 17 16.550781 17 16 C 17 15.449219 16.550781 15 16 15 Z M 12.5 19 C 11.671875 19 11 19.671875 11 20.5 C 11 21.328125 11.671875 22 12.5 22 C 13.328125 22 14 21.328125 14 20.5 C 14 19.671875 13.328125 19 12.5 19 Z M 19.5 20 C 18.671875 20 18 20.671875 18 21.5 C 18 22.328125 18.671875 23 19.5 23 C 20.328125 23 21 22.328125 21 21.5 C 21 20.671875 20.328125 20 19.5 20 Z"></path>
+</svg>
+</div>
+<div class="mb-4 mt-1 sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 mb-1 font-bold">Name</div>
+<div class="break-words">wordpress_sec_*</div>
+</div>
+<div class="hidden sm:inline truncate" data-controller="tooltip" data-tippy-content="wordpress_sec_*">
+wordpress_sec_*
+</div>
+</div>
+<div class="mb-4 mt-1 font-normal sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 font-bold">Type</div>
+<div class="mt-1 text-gray-500 dark:text-gray-300">Cookie</div>
+</div>
+<dl class="mt-2 font-normal sm:hidden">
+<div class="mb-4 mt-1">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Description</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">Used to store your authentication details.</dd>
+</div>
+<div class="grid grid-cols-2 gap-2 mb-2">
+<div class="col">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Duration</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">Session</dd>
+</div>
+</div>
+</dl>
+</td>
+<td class="hidden px-3 py-2 sm:table-cell truncate max-w-[100px]">
+<div class="text-sm text-gray-500 dark:text-gray-300 inline" data-controller="tooltip" data-tippy-content="Session">Session</div>
+</td>
+<td class="hidden px-3 py-2 text-sm text-gray-500 dark:text-gray-300 sm:table-cell max-w-[300px]">
+<div class="w-fit" data-controller="tooltip" data-tippy-content="<div dir='auto'>Used to store your authentication details.</div>" data-tippy-placement="left">
+<svg aria-hidden="true" class="w-5 h-5 text-gray-400" fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</td>
+</tr>
+<tr>
+<td class="sm:flex flex-row gap-2 py-2 pl-0 pr-3 text-sm font-medium text-gray-500 sm:w-auto sm:table-cell dark:text-gray-300 max-w-[200px]">
+<div class="sm:flex sm:items-center sm:gap-2">
+<div class="hidden sm:inline flex-shrink-0" data-controller="tooltip" data-tippy-content="Cookie">
+<svg fill="currentColor" height="16px" viewBox="0 0 32 32" width="16px" xmlns="http://www.w3.org/2000/svg">
+<path d="M 16 4 C 9.371094 4 4 9.371094 4 16 C 4 22.628906 9.371094 28 16 28 C 22.628906 28 28 22.628906 28 16 C 28 15.515625 27.964844 15.039063 27.90625 14.566406 C 27.507813 14.839844 27.023438 15 26.5 15 C 25.421875 15 24.511719 14.3125 24.160156 13.359375 C 23.535156 13.757813 22.796875 14 22 14 C 19.789063 14 18 12.210938 18 10 C 18 9.265625 18.210938 8.585938 18.558594 7.992188 C 18.539063 7.996094 18.519531 8 18.5 8 C 17.117188 8 16 6.882813 16 5.5 C 16 4.941406 16.1875 4.433594 16.496094 4.019531 C 16.332031 4.011719 16.167969 4 16 4 Z M 23.5 4 C 22.671875 4 22 4.671875 22 5.5 C 22 6.328125 22.671875 7 23.5 7 C 24.328125 7 25 6.328125 25 5.5 C 25 4.671875 24.328125 4 23.5 4 Z M 14.050781 6.1875 C 14.25 7.476563 15 8.585938 16.046875 9.273438 C 16.015625 9.511719 16 9.757813 16 10 C 16 13.308594 18.691406 16 22 16 C 22.496094 16 22.992188 15.9375 23.46875 15.8125 C 24.152344 16.4375 25.015625 16.851563 25.953125 16.96875 C 25.464844 22.03125 21.1875 26 16 26 C 10.484375 26 6 21.515625 6 16 C 6 11.152344 9.46875 7.097656 14.050781 6.1875 Z M 22 9 C 21.449219 9 21 9.449219 21 10 C 21 10.550781 21.449219 11 22 11 C 22.550781 11 23 10.550781 23 10 C 23 9.449219 22.550781 9 22 9 Z M 14 10 C 13.449219 10 13 10.449219 13 11 C 13 11.550781 13.449219 12 14 12 C 14.550781 12 15 11.550781 15 11 C 15 10.449219 14.550781 10 14 10 Z M 27 10 C 26.449219 10 26 10.449219 26 11 C 26 11.550781 26.449219 12 27 12 C 27.550781 12 28 11.550781 28 11 C 28 10.449219 27.550781 10 27 10 Z M 11 13 C 9.894531 13 9 13.894531 9 15 C 9 16.105469 9.894531 17 11 17 C 12.105469 17 13 16.105469 13 15 C 13 13.894531 12.105469 13 11 13 Z M 16 15 C 15.449219 15 15 15.449219 15 16 C 15 16.550781 15.449219 17 16 17 C 16.550781 17 17 16.550781 17 16 C 17 15.449219 16.550781 15 16 15 Z M 12.5 19 C 11.671875 19 11 19.671875 11 20.5 C 11 21.328125 11.671875 22 12.5 22 C 13.328125 22 14 21.328125 14 20.5 C 14 19.671875 13.328125 19 12.5 19 Z M 19.5 20 C 18.671875 20 18 20.671875 18 21.5 C 18 22.328125 18.671875 23 19.5 23 C 20.328125 23 21 22.328125 21 21.5 C 21 20.671875 20.328125 20 19.5 20 Z"></path>
+</svg>
+</div>
+<div class="mb-4 mt-1 sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 mb-1 font-bold">Name</div>
+<div class="break-words">wordpress_test_cookie</div>
+</div>
+<div class="hidden sm:inline truncate" data-controller="tooltip" data-tippy-content="wordpress_test_cookie">
+wordpress_test_cookie
+</div>
+</div>
+<div class="mb-4 mt-1 font-normal sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 font-bold">Type</div>
+<div class="mt-1 text-gray-500 dark:text-gray-300">Cookie</div>
+</div>
+<dl class="mt-2 font-normal sm:hidden">
+<div class="mb-4 mt-1">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Description</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">Used to check if cookies are enabled on the browser.</dd>
+</div>
+<div class="grid grid-cols-2 gap-2 mb-2">
+<div class="col">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Duration</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">Session</dd>
+</div>
+</div>
+</dl>
+</td>
+<td class="hidden px-3 py-2 sm:table-cell truncate max-w-[100px]">
+<div class="text-sm text-gray-500 dark:text-gray-300 inline" data-controller="tooltip" data-tippy-content="Session">Session</div>
+</td>
+<td class="hidden px-3 py-2 text-sm text-gray-500 dark:text-gray-300 sm:table-cell max-w-[300px]">
+<div class="w-fit" data-controller="tooltip" data-tippy-content="<div dir='auto'>Used to check if cookies are enabled on the browser.</div>" data-tippy-placement="left">
+<svg aria-hidden="true" class="w-5 h-5 text-gray-400" fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</td>
+</tr>
+<tr>
+<td class="sm:flex flex-row gap-2 py-2 pl-0 pr-3 text-sm font-medium text-gray-500 sm:w-auto sm:table-cell dark:text-gray-300 max-w-[200px]">
+<div class="sm:flex sm:items-center sm:gap-2">
+<div class="hidden sm:inline flex-shrink-0" data-controller="tooltip" data-tippy-content="Cookie">
+<svg fill="currentColor" height="16px" viewBox="0 0 32 32" width="16px" xmlns="http://www.w3.org/2000/svg">
+<path d="M 16 4 C 9.371094 4 4 9.371094 4 16 C 4 22.628906 9.371094 28 16 28 C 22.628906 28 28 22.628906 28 16 C 28 15.515625 27.964844 15.039063 27.90625 14.566406 C 27.507813 14.839844 27.023438 15 26.5 15 C 25.421875 15 24.511719 14.3125 24.160156 13.359375 C 23.535156 13.757813 22.796875 14 22 14 C 19.789063 14 18 12.210938 18 10 C 18 9.265625 18.210938 8.585938 18.558594 7.992188 C 18.539063 7.996094 18.519531 8 18.5 8 C 17.117188 8 16 6.882813 16 5.5 C 16 4.941406 16.1875 4.433594 16.496094 4.019531 C 16.332031 4.011719 16.167969 4 16 4 Z M 23.5 4 C 22.671875 4 22 4.671875 22 5.5 C 22 6.328125 22.671875 7 23.5 7 C 24.328125 7 25 6.328125 25 5.5 C 25 4.671875 24.328125 4 23.5 4 Z M 14.050781 6.1875 C 14.25 7.476563 15 8.585938 16.046875 9.273438 C 16.015625 9.511719 16 9.757813 16 10 C 16 13.308594 18.691406 16 22 16 C 22.496094 16 22.992188 15.9375 23.46875 15.8125 C 24.152344 16.4375 25.015625 16.851563 25.953125 16.96875 C 25.464844 22.03125 21.1875 26 16 26 C 10.484375 26 6 21.515625 6 16 C 6 11.152344 9.46875 7.097656 14.050781 6.1875 Z M 22 9 C 21.449219 9 21 9.449219 21 10 C 21 10.550781 21.449219 11 22 11 C 22.550781 11 23 10.550781 23 10 C 23 9.449219 22.550781 9 22 9 Z M 14 10 C 13.449219 10 13 10.449219 13 11 C 13 11.550781 13.449219 12 14 12 C 14.550781 12 15 11.550781 15 11 C 15 10.449219 14.550781 10 14 10 Z M 27 10 C 26.449219 10 26 10.449219 26 11 C 26 11.550781 26.449219 12 27 12 C 27.550781 12 28 11.550781 28 11 C 28 10.449219 27.550781 10 27 10 Z M 11 13 C 9.894531 13 9 13.894531 9 15 C 9 16.105469 9.894531 17 11 17 C 12.105469 17 13 16.105469 13 15 C 13 13.894531 12.105469 13 11 13 Z M 16 15 C 15.449219 15 15 15.449219 15 16 C 15 16.550781 15.449219 17 16 17 C 16.550781 17 17 16.550781 17 16 C 17 15.449219 16.550781 15 16 15 Z M 12.5 19 C 11.671875 19 11 19.671875 11 20.5 C 11 21.328125 11.671875 22 12.5 22 C 13.328125 22 14 21.328125 14 20.5 C 14 19.671875 13.328125 19 12.5 19 Z M 19.5 20 C 18.671875 20 18 20.671875 18 21.5 C 18 22.328125 18.671875 23 19.5 23 C 20.328125 23 21 22.328125 21 21.5 C 21 20.671875 20.328125 20 19.5 20 Z"></path>
+</svg>
+</div>
+<div class="mb-4 mt-1 sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 mb-1 font-bold">Name</div>
+<div class="break-words">wp-settings-*</div>
+</div>
+<div class="hidden sm:inline truncate" data-controller="tooltip" data-tippy-content="wp-settings-*">
+wp-settings-*
+</div>
+</div>
+<div class="mb-4 mt-1 font-normal sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 font-bold">Type</div>
+<div class="mt-1 text-gray-500 dark:text-gray-300">Cookie</div>
+</div>
+<dl class="mt-2 font-normal sm:hidden">
+<div class="mb-4 mt-1">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Description</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">Used to persist a user's wp-admin configuration.</dd>
+</div>
+<div class="grid grid-cols-2 gap-2 mb-2">
+<div class="col">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Duration</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">1 year</dd>
+</div>
+</div>
+</dl>
+</td>
+<td class="hidden px-3 py-2 sm:table-cell truncate max-w-[100px]">
+<div class="text-sm text-gray-500 dark:text-gray-300 inline" data-controller="tooltip" data-tippy-content="1 year">1 year</div>
+</td>
+<td class="hidden px-3 py-2 text-sm text-gray-500 dark:text-gray-300 sm:table-cell max-w-[300px]">
+<div class="w-fit" data-controller="tooltip" data-tippy-content="<div dir='auto'>Used to persist a user's wp-admin configuration.</div>" data-tippy-placement="left">
+<svg aria-hidden="true" class="w-5 h-5 text-gray-400" fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</td>
+</tr>
+<tr>
+<td class="sm:flex flex-row gap-2 py-2 pl-0 pr-3 text-sm font-medium text-gray-500 sm:w-auto sm:table-cell dark:text-gray-300 max-w-[200px]">
+<div class="sm:flex sm:items-center sm:gap-2">
+<div class="hidden sm:inline flex-shrink-0" data-controller="tooltip" data-tippy-content="Cookie">
+<svg fill="currentColor" height="16px" viewBox="0 0 32 32" width="16px" xmlns="http://www.w3.org/2000/svg">
+<path d="M 16 4 C 9.371094 4 4 9.371094 4 16 C 4 22.628906 9.371094 28 16 28 C 22.628906 28 28 22.628906 28 16 C 28 15.515625 27.964844 15.039063 27.90625 14.566406 C 27.507813 14.839844 27.023438 15 26.5 15 C 25.421875 15 24.511719 14.3125 24.160156 13.359375 C 23.535156 13.757813 22.796875 14 22 14 C 19.789063 14 18 12.210938 18 10 C 18 9.265625 18.210938 8.585938 18.558594 7.992188 C 18.539063 7.996094 18.519531 8 18.5 8 C 17.117188 8 16 6.882813 16 5.5 C 16 4.941406 16.1875 4.433594 16.496094 4.019531 C 16.332031 4.011719 16.167969 4 16 4 Z M 23.5 4 C 22.671875 4 22 4.671875 22 5.5 C 22 6.328125 22.671875 7 23.5 7 C 24.328125 7 25 6.328125 25 5.5 C 25 4.671875 24.328125 4 23.5 4 Z M 14.050781 6.1875 C 14.25 7.476563 15 8.585938 16.046875 9.273438 C 16.015625 9.511719 16 9.757813 16 10 C 16 13.308594 18.691406 16 22 16 C 22.496094 16 22.992188 15.9375 23.46875 15.8125 C 24.152344 16.4375 25.015625 16.851563 25.953125 16.96875 C 25.464844 22.03125 21.1875 26 16 26 C 10.484375 26 6 21.515625 6 16 C 6 11.152344 9.46875 7.097656 14.050781 6.1875 Z M 22 9 C 21.449219 9 21 9.449219 21 10 C 21 10.550781 21.449219 11 22 11 C 22.550781 11 23 10.550781 23 10 C 23 9.449219 22.550781 9 22 9 Z M 14 10 C 13.449219 10 13 10.449219 13 11 C 13 11.550781 13.449219 12 14 12 C 14.550781 12 15 11.550781 15 11 C 15 10.449219 14.550781 10 14 10 Z M 27 10 C 26.449219 10 26 10.449219 26 11 C 26 11.550781 26.449219 12 27 12 C 27.550781 12 28 11.550781 28 11 C 28 10.449219 27.550781 10 27 10 Z M 11 13 C 9.894531 13 9 13.894531 9 15 C 9 16.105469 9.894531 17 11 17 C 12.105469 17 13 16.105469 13 15 C 13 13.894531 12.105469 13 11 13 Z M 16 15 C 15.449219 15 15 15.449219 15 16 C 15 16.550781 15.449219 17 16 17 C 16.550781 17 17 16.550781 17 16 C 17 15.449219 16.550781 15 16 15 Z M 12.5 19 C 11.671875 19 11 19.671875 11 20.5 C 11 21.328125 11.671875 22 12.5 22 C 13.328125 22 14 21.328125 14 20.5 C 14 19.671875 13.328125 19 12.5 19 Z M 19.5 20 C 18.671875 20 18 20.671875 18 21.5 C 18 22.328125 18.671875 23 19.5 23 C 20.328125 23 21 22.328125 21 21.5 C 21 20.671875 20.328125 20 19.5 20 Z"></path>
+</svg>
+</div>
+<div class="mb-4 mt-1 sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 mb-1 font-bold">Name</div>
+<div class="break-words">wp-settings-time-*</div>
+</div>
+<div class="hidden sm:inline truncate" data-controller="tooltip" data-tippy-content="wp-settings-time-*">
+wp-settings-time-*
+</div>
+</div>
+<div class="mb-4 mt-1 font-normal sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 font-bold">Type</div>
+<div class="mt-1 text-gray-500 dark:text-gray-300">Cookie</div>
+</div>
+<dl class="mt-2 font-normal sm:hidden">
+<div class="mb-4 mt-1">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Description</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">Time when wp-settings- was set.</dd>
+</div>
+<div class="grid grid-cols-2 gap-2 mb-2">
+<div class="col">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Duration</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">1 year</dd>
+</div>
+</div>
+</dl>
+</td>
+<td class="hidden px-3 py-2 sm:table-cell truncate max-w-[100px]">
+<div class="text-sm text-gray-500 dark:text-gray-300 inline" data-controller="tooltip" data-tippy-content="1 year">1 year</div>
+</td>
+<td class="hidden px-3 py-2 text-sm text-gray-500 dark:text-gray-300 sm:table-cell max-w-[300px]">
+<div class="w-fit" data-controller="tooltip" data-tippy-content="<div dir='auto'>Time when wp-settings- was set.</div>" data-tippy-placement="left">
+<svg aria-hidden="true" class="w-5 h-5 text-gray-400" fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</td>
+</tr>
+<tr>
+<td class="sm:flex flex-row gap-2 py-2 pl-0 pr-3 text-sm font-medium text-gray-500 sm:w-auto sm:table-cell dark:text-gray-300 max-w-[200px]">
+<div class="sm:flex sm:items-center sm:gap-2">
+<div class="hidden sm:inline flex-shrink-0" data-controller="tooltip" data-tippy-content="Cookie">
+<svg fill="currentColor" height="16px" viewBox="0 0 32 32" width="16px" xmlns="http://www.w3.org/2000/svg">
+<path d="M 16 4 C 9.371094 4 4 9.371094 4 16 C 4 22.628906 9.371094 28 16 28 C 22.628906 28 28 22.628906 28 16 C 28 15.515625 27.964844 15.039063 27.90625 14.566406 C 27.507813 14.839844 27.023438 15 26.5 15 C 25.421875 15 24.511719 14.3125 24.160156 13.359375 C 23.535156 13.757813 22.796875 14 22 14 C 19.789063 14 18 12.210938 18 10 C 18 9.265625 18.210938 8.585938 18.558594 7.992188 C 18.539063 7.996094 18.519531 8 18.5 8 C 17.117188 8 16 6.882813 16 5.5 C 16 4.941406 16.1875 4.433594 16.496094 4.019531 C 16.332031 4.011719 16.167969 4 16 4 Z M 23.5 4 C 22.671875 4 22 4.671875 22 5.5 C 22 6.328125 22.671875 7 23.5 7 C 24.328125 7 25 6.328125 25 5.5 C 25 4.671875 24.328125 4 23.5 4 Z M 14.050781 6.1875 C 14.25 7.476563 15 8.585938 16.046875 9.273438 C 16.015625 9.511719 16 9.757813 16 10 C 16 13.308594 18.691406 16 22 16 C 22.496094 16 22.992188 15.9375 23.46875 15.8125 C 24.152344 16.4375 25.015625 16.851563 25.953125 16.96875 C 25.464844 22.03125 21.1875 26 16 26 C 10.484375 26 6 21.515625 6 16 C 6 11.152344 9.46875 7.097656 14.050781 6.1875 Z M 22 9 C 21.449219 9 21 9.449219 21 10 C 21 10.550781 21.449219 11 22 11 C 22.550781 11 23 10.550781 23 10 C 23 9.449219 22.550781 9 22 9 Z M 14 10 C 13.449219 10 13 10.449219 13 11 C 13 11.550781 13.449219 12 14 12 C 14.550781 12 15 11.550781 15 11 C 15 10.449219 14.550781 10 14 10 Z M 27 10 C 26.449219 10 26 10.449219 26 11 C 26 11.550781 26.449219 12 27 12 C 27.550781 12 28 11.550781 28 11 C 28 10.449219 27.550781 10 27 10 Z M 11 13 C 9.894531 13 9 13.894531 9 15 C 9 16.105469 9.894531 17 11 17 C 12.105469 17 13 16.105469 13 15 C 13 13.894531 12.105469 13 11 13 Z M 16 15 C 15.449219 15 15 15.449219 15 16 C 15 16.550781 15.449219 17 16 17 C 16.550781 17 17 16.550781 17 16 C 17 15.449219 16.550781 15 16 15 Z M 12.5 19 C 11.671875 19 11 19.671875 11 20.5 C 11 21.328125 11.671875 22 12.5 22 C 13.328125 22 14 21.328125 14 20.5 C 14 19.671875 13.328125 19 12.5 19 Z M 19.5 20 C 18.671875 20 18 20.671875 18 21.5 C 18 22.328125 18.671875 23 19.5 23 C 20.328125 23 21 22.328125 21 21.5 C 21 20.671875 20.328125 20 19.5 20 Z"></path>
+</svg>
+</div>
+<div class="mb-4 mt-1 sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 mb-1 font-bold">Name</div>
+<div class="break-words">wp_lang</div>
+</div>
+<div class="hidden sm:inline truncate" data-controller="tooltip" data-tippy-content="wp_lang">
+wp_lang
+</div>
+</div>
+<div class="mb-4 mt-1 font-normal sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 font-bold">Type</div>
+<div class="mt-1 text-gray-500 dark:text-gray-300">Cookie</div>
+</div>
+<dl class="mt-2 font-normal sm:hidden">
+<div class="mb-4 mt-1">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Description</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">Used to store the user's language preference.</dd>
+</div>
+<div class="grid grid-cols-2 gap-2 mb-2">
+<div class="col">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Duration</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">1 year</dd>
+</div>
+</div>
+</dl>
+</td>
+<td class="hidden px-3 py-2 sm:table-cell truncate max-w-[100px]">
+<div class="text-sm text-gray-500 dark:text-gray-300 inline" data-controller="tooltip" data-tippy-content="1 year">1 year</div>
+</td>
+<td class="hidden px-3 py-2 text-sm text-gray-500 dark:text-gray-300 sm:table-cell max-w-[300px]">
+<div class="w-fit" data-controller="tooltip" data-tippy-content="<div dir='auto'>Used to store the user's language preference.</div>" data-tippy-placement="left">
+<svg aria-hidden="true" class="w-5 h-5 text-gray-400" fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</fieldset>
+</div>
+</fieldset>
+<fieldset class="mb-2 border rounded-lg overflow-hidden bg-white/25 border-gray-400/25 dark:border-zinc-950/25 dark:bg-zinc-950/25" x-data="{category: 'marketing', open: false}">
+<legend class="sr-only">Marketing</legend>
+<div :class="{ 'border-b border-gray-400/25 dark:border-zinc-950/25': open }" @click="if (!$event.target.closest(&quot;.toggle&quot;)) { open = !open }" class="toggle-details px-4 py-2 select-none category-details-toggle bg-gray-300/25 hover:bg-gray-200/75 dark:bg-zinc-950/25 dark:hover:bg-zinc-950/25 cursor-pointer">
+<div class="flex items-center justify-between w-full flex-row">
+<span class="text-body-heading" id="marketing-label">
+<div class="label select-none m-0 cursor-pointer">
+<div class="flex items-center justify-between text-body-heading flex-row">
+<div class="icon mr-1 sm:mr-2">
+<svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" x-show="!open">
+<path clip-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" fill-rule="evenodd"></path>
+</svg>
+<svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" x-show="open" style="display: none;">
+<path clip-rule="evenodd" d="M14.78 12.79a.75.75 0 01-1.06-.02L10 8.832l-3.71 3.938a.75.75 0 01-1.08-1.04l4.25-4.5a.75.75 0 011.08 0l4.25 4.5a.75.75 0 01-.02 1.06z" fill-rule="evenodd"></path>
+</svg>
+</div>
+<span class="m-0 font-bold text-body-heading">Marketing</span>
+</div>
+</div>
+
+</span>
+<div x-show="true" x-data="{ 
+  enabled: false, 
+  readOnly: false
+}" x-init="
+  $watch('enabled', value => {
+    $refs.input.checked = value;
+    $refs.input.dispatchEvent(new Event('change'));
+  });
+" class="select-none flex items-center flex-row">
+  <label for="marketing" class="sr-only">Marketing</label>
+  <input type="checkbox" id="marketing" name="marketing" value="true" x-ref="input" x-model="enabled" readonly="false" disabled="false" data-type="category" data-category="marketing" class="hidden category">
+
+  <span class="text-xs text-gray-500 font-medium bg-white/75 ring-1 ring-gray-200 px-2 py-0.5 mx-2 rounded dark:bg-zinc-900/50 dark:text-gray-300 dark:ring-zinc-950/75 whitespace-nowrap" x-show="readOnly &amp;&amp; enabled" style="display: none;">Always enabled</span>
+
+  <button type="button" @click="if (!readOnly) enabled = !enabled" :class="{ 'bg-primary-bg': enabled || readOnly, 'bg-gray-400/75 dark:bg-zinc-400/75': !enabled &amp;&amp; !readOnly, 'cursor-not-allowed': readOnly, 'cursor-pointer': !readOnly }" class="toggle relative inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-bg focus:ring-offset-2 bg-gray-400/75 dark:bg-zinc-400/75 cursor-pointer" role="switch" :aria-checked="enabled.toString()" aria-checked="false">
+    <span class="sr-only">Enable</span>
+    <span :class="{ 'translate-x-5': enabled, 'translate-x-0': !enabled }" class="pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white dark:bg-black shadow ring-0 transition duration-200 ease-in-out translate-x-0">
+      <span :class="{ 'opacity-0 duration-100 ease-out': enabled, 'opacity-100 duration-200 ease-in': !enabled }" class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity opacity-100 duration-200 ease-in" aria-hidden="true">
+        <svg class="h-3 w-3 text-gray-300 dark:text-zinc-400" fill="none" viewBox="0 0 12 12">
+          <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </span>
+      <span :class="{ 'opacity-100 duration-200 ease-in': enabled, 'opacity-0 duration-100 ease-out': !enabled }" class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity opacity-0 duration-100 ease-out" aria-hidden="true">
+        <svg class="h-3 w-3 text-primary-bg" fill="currentColor" viewBox="0 0 12 12">
+          <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z"></path>
+        </svg>
+      </span>
+    </span>
+  </button>
+</div>
+
+</div>
+</div>
+<div class="category-details more-details" x-collapse.duration.200ms="true" x-show="open" style="display: none; height: 0px; overflow: hidden;" hidden="">
+<div class="px-4 py-2">
+<p class="text-sm text-gray-500 mt-1 text-pretty dark:text-gray-300" dir="auto">Marketing cookies make it possible to show you more relevant social media content and advertisements on our website and other platforms.</p>
+</div>
+<fieldset class="px-4 py-2" x-show="true">
+<legend class="sr-only">Facebook Pixel</legend>
+<div @click="if (!$event.target.closest(&quot;.toggle&quot;)) { open = !open }" class="toggle-details service-wrapper border rounded-lg px-2 sm:px-4 py-2 my-2 select-none hover:bg-gray-50/25 border-gray-400/25 dark:border-zinc-950/25 dark:hover:bg-zinc-950/25 cursor-pointer" x-data="{open: false}">
+<div class="flex items-center justify-between w-full flex-row">
+<div class="label select-none m-0 cursor-pointer">
+<div class="flex items-center justify-between text-body-heading flex-row">
+<div class="icon mr-1 sm:mr-2">
+<svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" x-show="!open">
+<path clip-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" fill-rule="evenodd"></path>
+</svg>
+<svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" x-show="open" style="display: none;">
+<path clip-rule="evenodd" d="M14.78 12.79a.75.75 0 01-1.06-.02L10 8.832l-3.71 3.938a.75.75 0 01-1.08-1.04l4.25-4.5a.75.75 0 011.08 0l4.25 4.5a.75.75 0 01-.02 1.06z" fill-rule="evenodd"></path>
+</svg>
+</div>
+<span class="m-0 font-bold text-body-heading">Facebook Pixel</span>
+</div>
+</div>
+
+<div x-show="true" x-data="{ 
+  enabled: false, 
+  readOnly: false
+}" x-init="
+  $watch('enabled', value => {
+    $refs.input.checked = value;
+    $refs.input.dispatchEvent(new Event('change'));
+  });
+" class="select-none flex items-center flex-row">
+  <label for="Facebook Pixel" class="sr-only">Marketing</label>
+  <input type="checkbox" id="Facebook Pixel" name="marketing[Facebook Pixel]" value="true" x-ref="input" x-model="enabled" readonly="false" disabled="false" data-type="service" data-category="marketing" class="hidden service">
+
+  <span class="text-xs text-gray-500 font-medium bg-white/75 ring-1 ring-gray-200 px-2 py-0.5 mx-2 rounded dark:bg-zinc-900/50 dark:text-gray-300 dark:ring-zinc-950/75 whitespace-nowrap" x-show="readOnly &amp;&amp; enabled" style="display: none;">Always enabled</span>
+
+  <button type="button" @click="if (!readOnly) enabled = !enabled" :class="{ 'bg-primary-bg': enabled || readOnly, 'bg-gray-400/75 dark:bg-zinc-400/75': !enabled &amp;&amp; !readOnly, 'cursor-not-allowed': readOnly, 'cursor-pointer': !readOnly }" class="toggle relative inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-bg focus:ring-offset-2 bg-gray-400/75 dark:bg-zinc-400/75 cursor-pointer" role="switch" :aria-checked="enabled.toString()" aria-checked="false">
+    <span class="sr-only">Enable</span>
+    <span :class="{ 'translate-x-5': enabled, 'translate-x-0': !enabled }" class="pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white dark:bg-black shadow ring-0 transition duration-200 ease-in-out translate-x-0">
+      <span :class="{ 'opacity-0 duration-100 ease-out': enabled, 'opacity-100 duration-200 ease-in': !enabled }" class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity opacity-100 duration-200 ease-in" aria-hidden="true">
+        <svg class="h-3 w-3 text-gray-300 dark:text-zinc-400" fill="none" viewBox="0 0 12 12">
+          <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </span>
+      <span :class="{ 'opacity-100 duration-200 ease-in': enabled, 'opacity-0 duration-100 ease-out': !enabled }" class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity opacity-0 duration-100 ease-out" aria-hidden="true">
+        <svg class="h-3 w-3 text-primary-bg" fill="currentColor" viewBox="0 0 12 12">
+          <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z"></path>
+        </svg>
+      </span>
+    </span>
+  </button>
+</div>
+
+</div>
+<div class="more-details" x-collapse.duration.200ms="true" x-show="open" style="display: none; height: 0px; overflow: hidden;" hidden="">
+<p class="text-sm text-gray-500 mt-2 text-pretty dark:text-gray-300" dir="auto">We use Facebook Pixel to track visitor activity on our site, which helps us optimize our Facebook advertising campaigns and measure their effectiveness.</p>
+<p class="text-sm text-gray-500 mt-2 text-pretty dark:text-gray-300" dir="auto">
+<a target="_blank" class="text-gray-500 dark:text-gray-300 font-medium underline underline-offset-4 hover:decoration-2 hover:text-gray-700 dark:hover:text-body-heading focus:text-gray-700 dark:focus:text-gray-100" href="https://www.facebook.com/policy.php">Privacy Policy
+<span>→</span>
+</a></p>
+<div class="mt-4">
+<table class="table-fixed min-w-full divide-y first:divide-y-0 divide-gray-400/25 dark:divide-zinc-950/25" dir="auto">
+<thead>
+<tr class="text-gray-500 font-normal dark:text-gray-300">
+<th class="hidden px-3 pb-2 text-sm sm:table-cell pl-0 w-full text-left">
+Name
+</th>
+<th class="hidden px-3 pb-2 text-sm sm:table-cell w-[150px] text-left">
+Duration
+</th>
+<th class="hidden px-3 pb-2 text-sm sm:table-cell text-left">
+</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-400/25 dark:divide-zinc-950/25">
+<tr>
+<td class="sm:flex flex-row gap-2 py-2 pl-0 pr-3 text-sm font-medium text-gray-500 sm:w-auto sm:table-cell dark:text-gray-300 max-w-[200px]">
+<div class="sm:flex sm:items-center sm:gap-2">
+<div class="hidden sm:inline flex-shrink-0" data-controller="tooltip" data-tippy-content="Cookie">
+<svg fill="currentColor" height="16px" viewBox="0 0 32 32" width="16px" xmlns="http://www.w3.org/2000/svg">
+<path d="M 16 4 C 9.371094 4 4 9.371094 4 16 C 4 22.628906 9.371094 28 16 28 C 22.628906 28 28 22.628906 28 16 C 28 15.515625 27.964844 15.039063 27.90625 14.566406 C 27.507813 14.839844 27.023438 15 26.5 15 C 25.421875 15 24.511719 14.3125 24.160156 13.359375 C 23.535156 13.757813 22.796875 14 22 14 C 19.789063 14 18 12.210938 18 10 C 18 9.265625 18.210938 8.585938 18.558594 7.992188 C 18.539063 7.996094 18.519531 8 18.5 8 C 17.117188 8 16 6.882813 16 5.5 C 16 4.941406 16.1875 4.433594 16.496094 4.019531 C 16.332031 4.011719 16.167969 4 16 4 Z M 23.5 4 C 22.671875 4 22 4.671875 22 5.5 C 22 6.328125 22.671875 7 23.5 7 C 24.328125 7 25 6.328125 25 5.5 C 25 4.671875 24.328125 4 23.5 4 Z M 14.050781 6.1875 C 14.25 7.476563 15 8.585938 16.046875 9.273438 C 16.015625 9.511719 16 9.757813 16 10 C 16 13.308594 18.691406 16 22 16 C 22.496094 16 22.992188 15.9375 23.46875 15.8125 C 24.152344 16.4375 25.015625 16.851563 25.953125 16.96875 C 25.464844 22.03125 21.1875 26 16 26 C 10.484375 26 6 21.515625 6 16 C 6 11.152344 9.46875 7.097656 14.050781 6.1875 Z M 22 9 C 21.449219 9 21 9.449219 21 10 C 21 10.550781 21.449219 11 22 11 C 22.550781 11 23 10.550781 23 10 C 23 9.449219 22.550781 9 22 9 Z M 14 10 C 13.449219 10 13 10.449219 13 11 C 13 11.550781 13.449219 12 14 12 C 14.550781 12 15 11.550781 15 11 C 15 10.449219 14.550781 10 14 10 Z M 27 10 C 26.449219 10 26 10.449219 26 11 C 26 11.550781 26.449219 12 27 12 C 27.550781 12 28 11.550781 28 11 C 28 10.449219 27.550781 10 27 10 Z M 11 13 C 9.894531 13 9 13.894531 9 15 C 9 16.105469 9.894531 17 11 17 C 12.105469 17 13 16.105469 13 15 C 13 13.894531 12.105469 13 11 13 Z M 16 15 C 15.449219 15 15 15.449219 15 16 C 15 16.550781 15.449219 17 16 17 C 16.550781 17 17 16.550781 17 16 C 17 15.449219 16.550781 15 16 15 Z M 12.5 19 C 11.671875 19 11 19.671875 11 20.5 C 11 21.328125 11.671875 22 12.5 22 C 13.328125 22 14 21.328125 14 20.5 C 14 19.671875 13.328125 19 12.5 19 Z M 19.5 20 C 18.671875 20 18 20.671875 18 21.5 C 18 22.328125 18.671875 23 19.5 23 C 20.328125 23 21 22.328125 21 21.5 C 21 20.671875 20.328125 20 19.5 20 Z"></path>
+</svg>
+</div>
+<div class="mb-4 mt-1 sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 mb-1 font-bold">Name</div>
+<div class="break-words">_fbc</div>
+</div>
+<div class="hidden sm:inline truncate" data-controller="tooltip" data-tippy-content="_fbc">
+_fbc
+</div>
+</div>
+<div class="mb-4 mt-1 font-normal sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 font-bold">Type</div>
+<div class="mt-1 text-gray-500 dark:text-gray-300">Cookie</div>
+</div>
+<dl class="mt-2 font-normal sm:hidden">
+<div class="mb-4 mt-1">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Description</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">Used to store last visit information for ad attribution purposes.</dd>
+</div>
+<div class="grid grid-cols-2 gap-2 mb-2">
+<div class="col">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Duration</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">90 days</dd>
+</div>
+</div>
+</dl>
+</td>
+<td class="hidden px-3 py-2 sm:table-cell truncate max-w-[100px]">
+<div class="text-sm text-gray-500 dark:text-gray-300 inline" data-controller="tooltip" data-tippy-content="90 days">90 days</div>
+</td>
+<td class="hidden px-3 py-2 text-sm text-gray-500 dark:text-gray-300 sm:table-cell max-w-[300px]">
+<div class="w-fit" data-controller="tooltip" data-tippy-content="<div dir='auto'>Used to store last visit information for ad attribution purposes.</div>" data-tippy-placement="left">
+<svg aria-hidden="true" class="w-5 h-5 text-gray-400" fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</td>
+</tr>
+<tr>
+<td class="sm:flex flex-row gap-2 py-2 pl-0 pr-3 text-sm font-medium text-gray-500 sm:w-auto sm:table-cell dark:text-gray-300 max-w-[200px]">
+<div class="sm:flex sm:items-center sm:gap-2">
+<div class="hidden sm:inline flex-shrink-0" data-controller="tooltip" data-tippy-content="Cookie">
+<svg fill="currentColor" height="16px" viewBox="0 0 32 32" width="16px" xmlns="http://www.w3.org/2000/svg">
+<path d="M 16 4 C 9.371094 4 4 9.371094 4 16 C 4 22.628906 9.371094 28 16 28 C 22.628906 28 28 22.628906 28 16 C 28 15.515625 27.964844 15.039063 27.90625 14.566406 C 27.507813 14.839844 27.023438 15 26.5 15 C 25.421875 15 24.511719 14.3125 24.160156 13.359375 C 23.535156 13.757813 22.796875 14 22 14 C 19.789063 14 18 12.210938 18 10 C 18 9.265625 18.210938 8.585938 18.558594 7.992188 C 18.539063 7.996094 18.519531 8 18.5 8 C 17.117188 8 16 6.882813 16 5.5 C 16 4.941406 16.1875 4.433594 16.496094 4.019531 C 16.332031 4.011719 16.167969 4 16 4 Z M 23.5 4 C 22.671875 4 22 4.671875 22 5.5 C 22 6.328125 22.671875 7 23.5 7 C 24.328125 7 25 6.328125 25 5.5 C 25 4.671875 24.328125 4 23.5 4 Z M 14.050781 6.1875 C 14.25 7.476563 15 8.585938 16.046875 9.273438 C 16.015625 9.511719 16 9.757813 16 10 C 16 13.308594 18.691406 16 22 16 C 22.496094 16 22.992188 15.9375 23.46875 15.8125 C 24.152344 16.4375 25.015625 16.851563 25.953125 16.96875 C 25.464844 22.03125 21.1875 26 16 26 C 10.484375 26 6 21.515625 6 16 C 6 11.152344 9.46875 7.097656 14.050781 6.1875 Z M 22 9 C 21.449219 9 21 9.449219 21 10 C 21 10.550781 21.449219 11 22 11 C 22.550781 11 23 10.550781 23 10 C 23 9.449219 22.550781 9 22 9 Z M 14 10 C 13.449219 10 13 10.449219 13 11 C 13 11.550781 13.449219 12 14 12 C 14.550781 12 15 11.550781 15 11 C 15 10.449219 14.550781 10 14 10 Z M 27 10 C 26.449219 10 26 10.449219 26 11 C 26 11.550781 26.449219 12 27 12 C 27.550781 12 28 11.550781 28 11 C 28 10.449219 27.550781 10 27 10 Z M 11 13 C 9.894531 13 9 13.894531 9 15 C 9 16.105469 9.894531 17 11 17 C 12.105469 17 13 16.105469 13 15 C 13 13.894531 12.105469 13 11 13 Z M 16 15 C 15.449219 15 15 15.449219 15 16 C 15 16.550781 15.449219 17 16 17 C 16.550781 17 17 16.550781 17 16 C 17 15.449219 16.550781 15 16 15 Z M 12.5 19 C 11.671875 19 11 19.671875 11 20.5 C 11 21.328125 11.671875 22 12.5 22 C 13.328125 22 14 21.328125 14 20.5 C 14 19.671875 13.328125 19 12.5 19 Z M 19.5 20 C 18.671875 20 18 20.671875 18 21.5 C 18 22.328125 18.671875 23 19.5 23 C 20.328125 23 21 22.328125 21 21.5 C 21 20.671875 20.328125 20 19.5 20 Z"></path>
+</svg>
+</div>
+<div class="mb-4 mt-1 sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 mb-1 font-bold">Name</div>
+<div class="break-words">_fbp</div>
+</div>
+<div class="hidden sm:inline truncate" data-controller="tooltip" data-tippy-content="_fbp">
+_fbp
+</div>
+</div>
+<div class="mb-4 mt-1 font-normal sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 font-bold">Type</div>
+<div class="mt-1 text-gray-500 dark:text-gray-300">Cookie</div>
+</div>
+<dl class="mt-2 font-normal sm:hidden">
+<div class="mb-4 mt-1">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Description</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">Used by Facebook to deliver a series of advertisement products such as real-time bidding from third-party advertisers.</dd>
+</div>
+<div class="grid grid-cols-2 gap-2 mb-2">
+<div class="col">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Duration</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">90 days</dd>
+</div>
+</div>
+</dl>
+</td>
+<td class="hidden px-3 py-2 sm:table-cell truncate max-w-[100px]">
+<div class="text-sm text-gray-500 dark:text-gray-300 inline" data-controller="tooltip" data-tippy-content="90 days">90 days</div>
+</td>
+<td class="hidden px-3 py-2 text-sm text-gray-500 dark:text-gray-300 sm:table-cell max-w-[300px]">
+<div class="w-fit" data-controller="tooltip" data-tippy-content="<div dir='auto'>Used by Facebook to deliver a series of advertisement products such as real-time bidding from third-party advertisers.</div>" data-tippy-placement="left">
+<svg aria-hidden="true" class="w-5 h-5 text-gray-400" fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</td>
+</tr>
+<tr>
+<td class="sm:flex flex-row gap-2 py-2 pl-0 pr-3 text-sm font-medium text-gray-500 sm:w-auto sm:table-cell dark:text-gray-300 max-w-[200px]">
+<div class="sm:flex sm:items-center sm:gap-2">
+<div class="hidden sm:inline flex-shrink-0" data-controller="tooltip" data-tippy-content="Cookie">
+<svg fill="currentColor" height="16px" viewBox="0 0 32 32" width="16px" xmlns="http://www.w3.org/2000/svg">
+<path d="M 16 4 C 9.371094 4 4 9.371094 4 16 C 4 22.628906 9.371094 28 16 28 C 22.628906 28 28 22.628906 28 16 C 28 15.515625 27.964844 15.039063 27.90625 14.566406 C 27.507813 14.839844 27.023438 15 26.5 15 C 25.421875 15 24.511719 14.3125 24.160156 13.359375 C 23.535156 13.757813 22.796875 14 22 14 C 19.789063 14 18 12.210938 18 10 C 18 9.265625 18.210938 8.585938 18.558594 7.992188 C 18.539063 7.996094 18.519531 8 18.5 8 C 17.117188 8 16 6.882813 16 5.5 C 16 4.941406 16.1875 4.433594 16.496094 4.019531 C 16.332031 4.011719 16.167969 4 16 4 Z M 23.5 4 C 22.671875 4 22 4.671875 22 5.5 C 22 6.328125 22.671875 7 23.5 7 C 24.328125 7 25 6.328125 25 5.5 C 25 4.671875 24.328125 4 23.5 4 Z M 14.050781 6.1875 C 14.25 7.476563 15 8.585938 16.046875 9.273438 C 16.015625 9.511719 16 9.757813 16 10 C 16 13.308594 18.691406 16 22 16 C 22.496094 16 22.992188 15.9375 23.46875 15.8125 C 24.152344 16.4375 25.015625 16.851563 25.953125 16.96875 C 25.464844 22.03125 21.1875 26 16 26 C 10.484375 26 6 21.515625 6 16 C 6 11.152344 9.46875 7.097656 14.050781 6.1875 Z M 22 9 C 21.449219 9 21 9.449219 21 10 C 21 10.550781 21.449219 11 22 11 C 22.550781 11 23 10.550781 23 10 C 23 9.449219 22.550781 9 22 9 Z M 14 10 C 13.449219 10 13 10.449219 13 11 C 13 11.550781 13.449219 12 14 12 C 14.550781 12 15 11.550781 15 11 C 15 10.449219 14.550781 10 14 10 Z M 27 10 C 26.449219 10 26 10.449219 26 11 C 26 11.550781 26.449219 12 27 12 C 27.550781 12 28 11.550781 28 11 C 28 10.449219 27.550781 10 27 10 Z M 11 13 C 9.894531 13 9 13.894531 9 15 C 9 16.105469 9.894531 17 11 17 C 12.105469 17 13 16.105469 13 15 C 13 13.894531 12.105469 13 11 13 Z M 16 15 C 15.449219 15 15 15.449219 15 16 C 15 16.550781 15.449219 17 16 17 C 16.550781 17 17 16.550781 17 16 C 17 15.449219 16.550781 15 16 15 Z M 12.5 19 C 11.671875 19 11 19.671875 11 20.5 C 11 21.328125 11.671875 22 12.5 22 C 13.328125 22 14 21.328125 14 20.5 C 14 19.671875 13.328125 19 12.5 19 Z M 19.5 20 C 18.671875 20 18 20.671875 18 21.5 C 18 22.328125 18.671875 23 19.5 23 C 20.328125 23 21 22.328125 21 21.5 C 21 20.671875 20.328125 20 19.5 20 Z"></path>
+</svg>
+</div>
+<div class="mb-4 mt-1 sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 mb-1 font-bold">Name</div>
+<div class="break-words">fr</div>
+</div>
+<div class="hidden sm:inline truncate" data-controller="tooltip" data-tippy-content="fr">
+fr
+</div>
+</div>
+<div class="mb-4 mt-1 font-normal sm:hidden">
+<div class="text-gray-600 dark:text-gray-50 font-bold">Type</div>
+<div class="mt-1 text-gray-500 dark:text-gray-300">Cookie</div>
+</div>
+<dl class="mt-2 font-normal sm:hidden">
+<div class="mb-4 mt-1">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Description</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">Used by Facebook to deliver, measure, and improve the relevancy of ads.</dd>
+</div>
+<div class="grid grid-cols-2 gap-2 mb-2">
+<div class="col">
+<dt class="text-gray-600 dark:text-gray-50 font-bold">Duration</dt>
+<dd class="mt-1 text-gray-500 dark:text-gray-300">90 days</dd>
+</div>
+</div>
+</dl>
+</td>
+<td class="hidden px-3 py-2 sm:table-cell truncate max-w-[100px]">
+<div class="text-sm text-gray-500 dark:text-gray-300 inline" data-controller="tooltip" data-tippy-content="90 days">90 days</div>
+</td>
+<td class="hidden px-3 py-2 text-sm text-gray-500 dark:text-gray-300 sm:table-cell max-w-[300px]">
+<div class="w-fit" data-controller="tooltip" data-tippy-content="<div dir='auto'>Used by Facebook to deliver, measure, and improve the relevancy of ads.</div>" data-tippy-placement="left">
+<svg aria-hidden="true" class="w-5 h-5 text-gray-400" fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</fieldset>
+</div>
+</fieldset>

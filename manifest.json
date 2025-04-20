@@ -6,7 +6,16 @@
   "description": "Handles client side consent handshake",
 
   "homepage_url": "https://github.com/TiagoPR/cch",
-
+  
+  "permissions": ["scripting", "activeTab"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["consent.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
   "icons": {
     "48": "icons/handshake_48_2.png"
   }
