@@ -1,11 +1,7 @@
 // Browser extension implementation for consent cryptographic flow
 console.log("Content script loaded - Consent Cryptographic Handler");
 
-// Import crypto-web library (bundled version of our crypto utils)
-// Note: In a real implementation, you'd bundle crypto-utils.js with browserify or webpack
-// For now we'll implement the required functions directly here
-
-// WebCrypto API helpers for browser environment
+// Helpers for browser environment
 const cryptoUtils = {
 	// Convert hex string to ArrayBuffer
 	hexToArrayBuffer(hexString) {
@@ -33,7 +29,72 @@ const cryptoUtils = {
 		return new TextDecoder().decode(buffer);
 	},
 
-	// Generate symmetric key from shared secret
+	// BigInt modular exponentiation
+	modPow(base, exponent, modulus) {
+		if (modulus === 1n) return 0n;
+		let result = 1n;
+		base = base % modulus;
+		while (exponent > 0n) {
+			if (exponent % 2n === 1n) {
+				result = (result * base) % modulus;
+			}
+			exponent = exponent >> 1n;
+			base = (base * base) % modulus;
+		}
+		return result;
+	},
+
+	// Convert hex string to BigInt
+	hexToBigInt(hexString) {
+		return BigInt('0x' + hexString);
+	},
+
+	// Convert BigInt to hex string with proper padding
+	bigIntToHex(bigInt) {
+		let hex = bigInt.toString(16);
+		if (hex.length % 2) {
+			hex = '0' + hex;
+		}
+		return hex;
+	},
+
+	// Generate DH key pair using the server's parameters
+	generateDHKeyPair(prime, generator) {
+		// Generate random private key (256 bits for security)
+		const privateKeyBytes = window.crypto.getRandomValues(new Uint8Array(32));
+		let privateKey = 0n;
+		for (let i = 0; i < privateKeyBytes.length; i++) {
+			privateKey = (privateKey << 8n) + BigInt(privateKeyBytes[i]);
+		}
+
+		// Ensure private key is in valid range [2, prime-2]
+		const primeBigInt = this.hexToBigInt(prime);
+		privateKey = (privateKey % (primeBigInt - 2n)) + 2n;
+
+		// Compute public key: g^privateKey mod p
+		const generatorBigInt = this.hexToBigInt(generator);
+		const publicKey = this.modPow(generatorBigInt, privateKey, primeBigInt);
+
+		return {
+			privateKey: privateKey,
+			publicKey: publicKey
+		};
+	},
+
+	// Compute DH shared secret
+	computeDHSharedSecret(privateKey, serverPublicKey, prime) {
+		const serverPublicKeyBigInt = this.hexToBigInt(serverPublicKey);
+		const primeBigInt = this.hexToBigInt(prime);
+
+		// Compute shared secret: serverPublicKey^privateKey mod prime
+		const sharedSecret = this.modPow(serverPublicKeyBigInt, privateKey, primeBigInt);
+
+		// Convert to buffer for key derivation
+		const sharedSecretHex = this.bigIntToHex(sharedSecret);
+		return this.hexToArrayBuffer(sharedSecretHex);
+	},
+
+	// Generate symmetric key from shared secret using HKDF
 	async generateSymmetricKey(sharedSecret) {
 		// Import shared secret as key material
 		const keyMaterial = await window.crypto.subtle.importKey(
@@ -49,7 +110,7 @@ const cryptoUtils = {
 			{
 				name: 'HKDF',
 				hash: 'SHA-256',
-				salt: new Uint8Array(0),
+				salt: new Uint8Array(32), // 32 zero bytes like the server
 				info: new TextEncoder().encode('cifragem de consentimento')
 			},
 			keyMaterial,
@@ -85,11 +146,10 @@ const cryptoUtils = {
 			consentBytes
 		);
 
-		// In AES-GCM with WebCrypto, the auth tag is appended to the ciphertext
+		// In AES-GCM the auth tag is appended to the ciphertext
 		// We need to extract it to match our protocol
 		const encryptedBytes = new Uint8Array(encryptedContent);
 		const ciphertextLength = encryptedBytes.length - 16; // 16 bytes tag
-		// Slice alters the array, alternative
 		const ciphertext = new Uint8Array(encryptedBytes.buffer, 0, ciphertextLength);
 		const tag = new Uint8Array(encryptedBytes.buffer, ciphertextLength, 16);
 
@@ -142,22 +202,6 @@ const cryptoUtils = {
 		const pemFooter = "-----END PUBLIC KEY-----";
 		const pemBody = exportedAsBase64.match(/.{1,64}/g).join('\n');
 		return `${pemHeader}\n${pemBody}\n${pemFooter}`;
-	},
-
-	// Compute DH shared secret
-	async computeDHSharedSecret(privateKey, publicKey, prime, generator) {
-		// This is a simplified implementation - in real-world use WebCrypto's ECDH
-		// For demonstration, we're using a custom implementation
-		console.log("Computing DH shared secret...");
-
-		// In a real implementation, you'd use proper DH implementation
-		// For now, returning a mock shared secret
-		const mockSharedSecret = await window.crypto.subtle.digest(
-			'SHA-256',
-			this.stringToArrayBuffer(privateKey + publicKey)
-		);
-
-		return mockSharedSecret;
 	}
 };
 
@@ -172,50 +216,40 @@ async function processConsent(consentData) {
 
 		console.log('Received DH parameters:', dhParams);
 
-		// Step 2: Generate client keys
-		// For DH key pair (simplified for browser)
-		const clientPrivateKey = window.crypto.getRandomValues(new Uint8Array(32));
-		const clientPublicKeyRaw = await window.crypto.subtle.digest(
-			'SHA-256',
-			clientPrivateKey
-		);
-		const clientPublicKey = cryptoUtils.arrayBufferToHex(clientPublicKeyRaw);
+		// Step 2: Generate client DH key pair using server's parameters
+		const clientDHKeys = cryptoUtils.generateDHKeyPair(dhParams.prime, dhParams.generator);
+		const clientPublicKey = cryptoUtils.bigIntToHex(clientDHKeys.publicKey);
 
-		// For RSA signing key pair
+		console.log('Generated client DH keys');
+
+		// Step 3: Generate RSA signing key pair
 		const clientSigningKeyPair = await cryptoUtils.generateRSAKeyPair();
 		const clientPublicSigningKeyExported = await cryptoUtils.exportPublicKey(
 			clientSigningKeyPair.publicKey
 		);
 
-		console.log('Generated client keys');
+		console.log('Generated client RSA signing keys');
 
-		// Step 3: Compute shared secret
-		const serverPublicKey = cryptoUtils.hexToArrayBuffer(dhParams.publicKey);
-		const prime = cryptoUtils.hexToArrayBuffer(dhParams.prime);
-		const generator = cryptoUtils.hexToArrayBuffer(dhParams.generator);
-
-		const sharedSecret = await cryptoUtils.computeDHSharedSecret(
-			clientPrivateKey,
-			serverPublicKey,
-			prime,
-			generator
+		// Step 4: Compute shared secret
+		const sharedSecret = cryptoUtils.computeDHSharedSecret(
+			clientDHKeys.privateKey,
+			dhParams.publicKey,
+			dhParams.prime
 		);
 
 		console.log('Computed shared secret');
 
-		// Step 4: Derive symmetric key
+		// Step 5: Derive symmetric key
 		const symmetricKey = await cryptoUtils.generateSymmetricKey(sharedSecret);
 
 		console.log('Derived symmetric key');
 
-		console.log('Key type:', symmetricKey.constructor.name);
-
-		// Step 5: Encrypt consent data
+		// Step 6: Encrypt consent data
 		const encryptedConsent = await cryptoUtils.encryptConsent(symmetricKey, consentData);
 
 		console.log('Encrypted consent:', encryptedConsent);
 
-		// Step 6: Sign encrypted consent
+		// Step 7: Sign encrypted consent
 		const dataToSign = encryptedConsent.iv + encryptedConsent.ciphertext + encryptedConsent.tag;
 		const clientSignature = await cryptoUtils.signData(
 			clientSigningKeyPair.privateKey,
@@ -224,7 +258,7 @@ async function processConsent(consentData) {
 
 		console.log('Signed consent');
 
-		// Step 7: Send package to server
+		// Step 8: Send package to server
 		const consentPackage = {
 			encryptedConsent: encryptedConsent,
 			clientPublicKey: clientPublicKey,
@@ -321,9 +355,6 @@ document.addEventListener('click', function(event) {
 		}, 100);
 	}
 });
-
-// Browser extension implementation for consent cryptographic flow
-console.log("Content script loaded - Consent Cryptographic Handler");
 
 // Flag to track if we're processing consent
 let processingConsent = false;
