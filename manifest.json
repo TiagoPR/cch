@@ -7,7 +7,7 @@
 
   "homepage_url": "https://github.com/TiagoPR/cch",
   
-  "permissions": ["scripting", "activeTab"],
+  "permissions": ["scripting", "activeTab", "http://127.0.0.1/*"],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
@@ -17,7 +17,6 @@
     }
   ],
   "icons": {
-    "48": "icons/handshake_48_2.png"
+    "48": "icons/handshake_48.png"
   }
 }
-
