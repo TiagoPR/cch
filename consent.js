@@ -1,4 +1,4 @@
-// Browser extension implementation for consent cryptographic flow
+// Browser extension implementation for consent cryptographic flow with RSA
 console.log("Content script loaded - Consent Cryptographic Handler");
 
 // Helpers for browser environment
@@ -29,102 +29,63 @@ const cryptoUtils = {
 		return new TextDecoder().decode(buffer);
 	},
 
-	// BigInt modular exponentiation
-	modPow(base, exponent, modulus) {
-		if (modulus === 1n) return 0n;
-		let result = 1n;
-		base = base % modulus;
-		while (exponent > 0n) {
-			if (exponent % 2n === 1n) {
-				result = (result * base) % modulus;
-			}
-			exponent = exponent >> 1n;
-			base = (base * base) % modulus;
-		}
-		return result;
+	// Generate random symmetric key (32 bytes for AES-256)
+	generateRandomSymmetricKey() {
+		return window.crypto.getRandomValues(new Uint8Array(32));
 	},
 
-	// Convert hex string to BigInt
-	hexToBigInt(hexString) {
-		return BigInt('0x' + hexString);
-	},
-
-	// Convert BigInt to hex string with proper padding
-	bigIntToHex(bigInt) {
-		let hex = bigInt.toString(16);
-		if (hex.length % 2) {
-			hex = '0' + hex;
-		}
-		return hex;
-	},
-
-	// Generate DH key pair using the server's parameters
-	generateDHKeyPair(prime, generator) {
-		// Generate random private key (256 bits for security)
-		const privateKeyBytes = window.crypto.getRandomValues(new Uint8Array(32));
-		let privateKey = 0n;
-		for (let i = 0; i < privateKeyBytes.length; i++) {
-			privateKey = (privateKey << 8n) + BigInt(privateKeyBytes[i]);
-		}
-
-		// Ensure private key is in valid range [2, prime-2]
-		const primeBigInt = this.hexToBigInt(prime);
-		privateKey = (privateKey % (primeBigInt - 2n)) + 2n;
-
-		// Compute public key: g^privateKey mod p
-		const generatorBigInt = this.hexToBigInt(generator);
-		const publicKey = this.modPow(generatorBigInt, privateKey, primeBigInt);
-
-		return {
-			privateKey: privateKey,
-			publicKey: publicKey
-		};
-	},
-
-	// Compute DH shared secret
-	computeDHSharedSecret(privateKey, serverPublicKey, prime) {
-		const serverPublicKeyBigInt = this.hexToBigInt(serverPublicKey);
-		const primeBigInt = this.hexToBigInt(prime);
-
-		// Compute shared secret: serverPublicKey^privateKey mod prime
-		const sharedSecret = this.modPow(serverPublicKeyBigInt, privateKey, primeBigInt);
-
-		// Convert to buffer for key derivation
-		const sharedSecretHex = this.bigIntToHex(sharedSecret);
-		return this.hexToArrayBuffer(sharedSecretHex);
-	},
-
-	// Generate symmetric key from shared secret using HKDF
-	async generateSymmetricKey(sharedSecret) {
-		// Import shared secret as key material
-		const keyMaterial = await window.crypto.subtle.importKey(
-			'raw',
-			sharedSecret,
-			{ name: 'HKDF' },
-			false,
-			['deriveBits']
-		);
-
-		// Derive key using HKDF
-		const derivedBits = await window.crypto.subtle.deriveBits(
-			{
-				name: 'HKDF',
-				hash: 'SHA-256',
-				salt: new Uint8Array(32), // 32 zero bytes like the server
-				info: new TextEncoder().encode('cifragem de consentimento')
-			},
-			keyMaterial,
-			256 // 256 bits
-		);
-
-		// Import derived bits as AES key
+	// Import raw bytes as AES key
+	async importSymmetricKey(keyBytes) {
 		return window.crypto.subtle.importKey(
 			'raw',
-			derivedBits,
+			keyBytes,
 			{ name: 'AES-GCM', length: 256 },
 			false,
 			['encrypt', 'decrypt']
 		);
+	},
+
+	// Import RSA public key from PEM format
+	async importRSAPublicKey(pemKey) {
+		// Remove header, footer, and whitespace from PEM
+		const pemHeader = "-----BEGIN PUBLIC KEY-----";
+		const pemFooter = "-----END PUBLIC KEY-----";
+		const pemContents = pemKey
+			.replace(pemHeader, '')
+			.replace(pemFooter, '')
+			.replace(/\s/g, '');
+
+		// Convert base64 to ArrayBuffer
+		const binaryString = atob(pemContents);
+		const bytes = new Uint8Array(binaryString.length);
+		for (let i = 0; i < binaryString.length; i++) {
+			bytes[i] = binaryString.charCodeAt(i);
+		}
+
+		// Import the key
+		return window.crypto.subtle.importKey(
+			'spki',
+			bytes.buffer,
+			{
+				name: 'RSA-OAEP',
+				hash: { name: 'SHA-256' }
+			},
+			false,
+			['encrypt']
+		);
+	},
+
+	// Encrypt symmetric key with RSA public key
+	async encryptSymmetricKey(publicKey, symmetricKey) {
+		const encryptedKey = await window.crypto.subtle.encrypt(
+			{
+				name: 'RSA-OAEP'
+			},
+			publicKey,
+			symmetricKey
+		);
+
+		return this.arrayBufferToHex(encryptedKey);
 	},
 
 	// Encrypt consent data
@@ -180,8 +141,8 @@ const cryptoUtils = {
 		return this.arrayBufferToHex(signature);
 	},
 
-	// Generate RSA key pair
-	async generateRSAKeyPair() {
+	// Generate RSA key pair for signing
+	async generateRSASigningKeyPair() {
 		return window.crypto.subtle.generateKey(
 			{
 				name: 'RSA-PSS',
@@ -205,48 +166,39 @@ const cryptoUtils = {
 	}
 };
 
-// Klaro.js consent handler
+// Consent processing with RSA key exchange
 async function processConsent(consentData) {
-	console.log('Processing consent data:', consentData);
+	console.log('Processing consent data with RSA:', consentData);
 
 	try {
-		// Step 1: Fetch DH parameters from server
-		const dhParamsResponse = await fetch('http://127.0.0.1:3000/api/dhparams');
-		const dhParams = await dhParamsResponse.json();
+		// Step 1: Fetch server's RSA public key
+		const publicKeyResponse = await fetch('http://127.0.0.1:3000/api/publickey');
+		const publicKeyData = await publicKeyResponse.json();
 
-		console.log('Received DH parameters:', dhParams);
+		console.log('Received server public key data:', publicKeyData);
 
-		// Step 2: Generate client DH key pair using server's parameters
-		const clientDHKeys = cryptoUtils.generateDHKeyPair(dhParams.prime, dhParams.generator);
-		const clientPublicKey = cryptoUtils.bigIntToHex(clientDHKeys.publicKey);
+		// Step 2: Import server's RSA public key
+		const serverPublicKey = await cryptoUtils.importRSAPublicKey(publicKeyData.publicKey);
+		console.log('Imported server RSA public key');
 
-		console.log('Generated client DH keys');
+		// Step 3: Generate random symmetric key
+		const symmetricKeyBytes = cryptoUtils.generateRandomSymmetricKey();
+		const symmetricKey = await cryptoUtils.importSymmetricKey(symmetricKeyBytes);
+		console.log('Generated random symmetric key');
 
-		// Step 3: Generate RSA signing key pair
-		const clientSigningKeyPair = await cryptoUtils.generateRSAKeyPair();
+		// Step 4: Encrypt symmetric key with server's RSA public key
+		const encryptedSymmetricKey = await cryptoUtils.encryptSymmetricKey(serverPublicKey, symmetricKeyBytes);
+		console.log('Encrypted symmetric key with server public key');
+
+		// Step 5: Generate RSA signing key pair for client
+		const clientSigningKeyPair = await cryptoUtils.generateRSASigningKeyPair();
 		const clientPublicSigningKeyExported = await cryptoUtils.exportPublicKey(
 			clientSigningKeyPair.publicKey
 		);
-
 		console.log('Generated client RSA signing keys');
 
-		// Step 4: Compute shared secret
-		const sharedSecret = cryptoUtils.computeDHSharedSecret(
-			clientDHKeys.privateKey,
-			dhParams.publicKey,
-			dhParams.prime
-		);
-
-		console.log('Computed shared secret');
-
-		// Step 5: Derive symmetric key
-		const symmetricKey = await cryptoUtils.generateSymmetricKey(sharedSecret);
-
-		console.log('Derived symmetric key');
-
-		// Step 6: Encrypt consent data
+		// Step 6: Encrypt consent data with symmetric key
 		const encryptedConsent = await cryptoUtils.encryptConsent(symmetricKey, consentData);
-
 		console.log('Encrypted consent:', encryptedConsent);
 
 		// Step 7: Sign encrypted consent
@@ -255,13 +207,12 @@ async function processConsent(consentData) {
 			clientSigningKeyPair.privateKey,
 			cryptoUtils.stringToArrayBuffer(dataToSign)
 		);
-
 		console.log('Signed consent');
 
 		// Step 8: Send package to server
 		const consentPackage = {
 			encryptedConsent: encryptedConsent,
-			clientPublicKey: clientPublicKey,
+			encryptedSymmetricKey: encryptedSymmetricKey,
 			clientSignature: clientSignature,
 			clientPublicSigningKey: clientPublicSigningKeyExported
 		};
