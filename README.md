@@ -8,12 +8,13 @@ Este diagrama ilustra o processo de assinatura do consentimento entre o cliente 
 
 ## Assinatura Digital com RSA
 
-Para garantir a autenticidade do consentimento, é utilizado o algoritmo RSA de assinatura:
+Para garantir a autenticidade do consentimento, é utilizado o algoritmo RSA de assinatura. Como o consentimento está representado em formato JSON, será utilizado o padrão **JWS (JSON Web Signature)** para encapsular os dados e a assinatura de forma estruturada.
 
 ### Assinatura (lado do cliente):
 
 - Calcula-se o hash da mensagem: `h = hash(msg)`
 - O hash é cifrado com a chave privada do cliente proveniente do certificado: `s = h^d mod n`, produzindo a assinatura `s`
+- O consentimento, a assinatura e os metadados são então estruturados num objeto **JWS**
 
 ### Verificação (lado do servidor):
 
@@ -21,6 +22,6 @@ Para garantir a autenticidade do consentimento, é utilizado o algoritmo RSA de 
 - A assinatura `s` é desencriptada com a chave pública do cliente: `h' = s^e mod n`
 - Compara-se `h` com `h'`. Se forem iguais, a assinatura é válida
 
-Isto garante que a mensagem foi de facto assinada pelo titular da chave privada correspondente à chave pública fornecida.
+A utilização de JWS garante que o consentimento assinado em JSON é facilmente transportável, verificável e validável de forma padronizada.
 
-A assinatura RSA assegura que o conteúdo não foi alterado e que provém de quem diz ser, i.e, protege contra alteração e falsificação.
+A assinatura RSA assegura que o conteúdo não foi alterado e que provém de quem afirma ser, ou seja, protege contra alteração e falsificação.
