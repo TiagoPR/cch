@@ -3,15 +3,6 @@ console.log("Content script loaded - Consent Cryptographic Handler");
 
 // Helpers for browser environment
 const cryptoUtils = {
-	// Convert hex string to ArrayBuffer
-	hexToArrayBuffer(hexString) {
-		const bytes = new Uint8Array(hexString.length / 2);
-		for (let i = 0; i < hexString.length; i += 2) {
-			bytes[i / 2] = parseInt(hexString.substring(i, i + 2), 16);
-		}
-		return bytes.buffer;
-	},
-
 	// Convert ArrayBuffer to hex string
 	arrayBufferToHex(buffer) {
 		return Array.from(new Uint8Array(buffer))
@@ -22,27 +13,6 @@ const cryptoUtils = {
 	// Convert string to ArrayBuffer
 	stringToArrayBuffer(str) {
 		return new TextEncoder().encode(str);
-	},
-
-	// Convert ArrayBuffer to string
-	arrayBufferToString(buffer) {
-		return new TextDecoder().decode(buffer);
-	},
-
-	// Generate random symmetric key (32 bytes for AES-256)
-	generateRandomSymmetricKey() {
-		return window.crypto.getRandomValues(new Uint8Array(32));
-	},
-
-	// Import raw bytes as AES key
-	async importSymmetricKey(keyBytes) {
-		return window.crypto.subtle.importKey(
-			'raw',
-			keyBytes,
-			{ name: 'AES-GCM', length: 256 },
-			false,
-			['encrypt', 'decrypt']
-		);
 	},
 
 	// Import RSA public key from PEM format
@@ -73,52 +43,6 @@ const cryptoUtils = {
 			false,
 			['encrypt']
 		);
-	},
-
-	// Encrypt symmetric key with RSA public key
-	async encryptSymmetricKey(publicKey, symmetricKey) {
-		const encryptedKey = await window.crypto.subtle.encrypt(
-			{
-				name: 'RSA-OAEP'
-			},
-			publicKey,
-			symmetricKey
-		);
-
-		return this.arrayBufferToHex(encryptedKey);
-	},
-
-	// Encrypt consent data
-	async encryptConsent(symmetricKey, consentData) {
-		// Generate random IV
-		const iv = window.crypto.getRandomValues(new Uint8Array(12));
-
-		// Convert consent data to JSON string and then to bytes
-		const consentBytes = new TextEncoder().encode(JSON.stringify(consentData));
-
-		// Encrypt
-		const encryptedContent = await window.crypto.subtle.encrypt(
-			{
-				name: 'AES-GCM',
-				iv: iv,
-				tagLength: 128 // 16 bytes tag
-			},
-			symmetricKey,
-			consentBytes
-		);
-
-		// In AES-GCM the auth tag is appended to the ciphertext
-		// We need to extract it to match our protocol
-		const encryptedBytes = new Uint8Array(encryptedContent);
-		const ciphertextLength = encryptedBytes.length - 16; // 16 bytes tag
-		const ciphertext = new Uint8Array(encryptedBytes.buffer, 0, ciphertextLength);
-		const tag = new Uint8Array(encryptedBytes.buffer, ciphertextLength, 16);
-
-		return {
-			ciphertext: this.arrayBufferToHex(ciphertext),
-			iv: this.arrayBufferToHex(iv),
-			tag: this.arrayBufferToHex(tag)
-		};
 	},
 
 	// Sign data with RSA-PSS
@@ -178,41 +102,27 @@ async function processConsent(consentData) {
 		console.log('Received server public key data:', publicKeyData);
 
 		// Step 2: Import server's RSA public key
-		const serverPublicKey = await cryptoUtils.importRSAPublicKey(publicKeyData.publicKey);
+		const serverPublicKey = await cryptoUtils.importRSAPublicKey(publicKeyData);
 		console.log('Imported server RSA public key');
 
-		// Step 3: Generate random symmetric key
-		const symmetricKeyBytes = cryptoUtils.generateRandomSymmetricKey();
-		const symmetricKey = await cryptoUtils.importSymmetricKey(symmetricKeyBytes);
-		console.log('Generated random symmetric key');
-
-		// Step 4: Encrypt symmetric key with server's RSA public key
-		const encryptedSymmetricKey = await cryptoUtils.encryptSymmetricKey(serverPublicKey, symmetricKeyBytes);
-		console.log('Encrypted symmetric key with server public key');
-
-		// Step 5: Generate RSA signing key pair for client
+		// Step 3: Generate RSA signing key pair for client
 		const clientSigningKeyPair = await cryptoUtils.generateRSASigningKeyPair();
 		const clientPublicSigningKeyExported = await cryptoUtils.exportPublicKey(
 			clientSigningKeyPair.publicKey
 		);
 		console.log('Generated client RSA signing keys');
 
-		// Step 6: Encrypt consent data with symmetric key
-		const encryptedConsent = await cryptoUtils.encryptConsent(symmetricKey, consentData);
-		console.log('Encrypted consent:', encryptedConsent);
-
-		// Step 7: Sign encrypted consent
-		const dataToSign = encryptedConsent.iv + encryptedConsent.ciphertext + encryptedConsent.tag;
+		// Step 4: Sign the consent data
+		const consentDataString = JSON.stringify(consentData);
 		const clientSignature = await cryptoUtils.signData(
 			clientSigningKeyPair.privateKey,
-			cryptoUtils.stringToArrayBuffer(dataToSign)
+			consentDataString
 		);
 		console.log('Signed consent');
 
-		// Step 8: Send package to server
+		// Step 5: Send package to server
 		const consentPackage = {
-			encryptedConsent: encryptedConsent,
-			encryptedSymmetricKey: encryptedSymmetricKey,
+			consentData: consentData,
 			clientSignature: clientSignature,
 			clientPublicSigningKey: clientPublicSigningKeyExported
 		};
