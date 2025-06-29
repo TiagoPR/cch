@@ -15,9 +15,16 @@ const cryptoUtils = {
 		return new TextEncoder().encode(str);
 	},
 
+	hexToArrayBuffer(hex) {
+		const bytes = new Uint8Array(hex.length / 2);
+		for (let i = 0; i < hex.length; i += 2) {
+			bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+		}
+		return bytes.buffer;
+	},
+
 	// Import RSA public key from PEM format
 	async importRSAPublicKey(pemKey) {
-		// Remove header, footer, and whitespace from PEM
 		const pemHeader = "-----BEGIN PUBLIC KEY-----";
 		const pemFooter = "-----END PUBLIC KEY-----";
 		const pemContents = pemKey
@@ -25,23 +32,21 @@ const cryptoUtils = {
 			.replace(pemFooter, '')
 			.replace(/\s/g, '');
 
-		// Convert base64 to ArrayBuffer
 		const binaryString = atob(pemContents);
 		const bytes = new Uint8Array(binaryString.length);
 		for (let i = 0; i < binaryString.length; i++) {
 			bytes[i] = binaryString.charCodeAt(i);
 		}
 
-		// Import the key
 		return window.crypto.subtle.importKey(
 			'spki',
 			bytes.buffer,
 			{
-				name: 'RSA-OAEP',
+				name: 'RSA-PSS',
 				hash: { name: 'SHA-256' }
 			},
 			false,
-			['encrypt']
+			['verify'] // ✅ allow verify
 		);
 	},
 
@@ -87,7 +92,25 @@ const cryptoUtils = {
 		const pemFooter = "-----END PUBLIC KEY-----";
 		const pemBody = exportedAsBase64.match(/.{1,64}/g).join('\n');
 		return `${pemHeader}\n${pemBody}\n${pemFooter}`;
+	},
+
+	async verifyServerSignature(serverPublicKey, data, signatureHex) {
+		const dataBuffer = new TextEncoder().encode(JSON.stringify(data));
+		const signatureBuffer = this.hexToArrayBuffer(signatureHex);
+
+		const isValid = await window.crypto.subtle.verify(
+			{
+				name: "RSA-PSS",
+				saltLength: 32
+			},
+			serverPublicKey,
+			signatureBuffer,
+			dataBuffer
+		);
+
+		return isValid;
 	}
+
 };
 
 // Consent processing with RSA key exchange
@@ -138,6 +161,20 @@ async function processConsent(consentData) {
 		});
 
 		const result = await response.json();
+
+		console.log("Client-side data string:", consentDataString);
+		// Step 6: Verify if signature is valid
+		const isValid = await cryptoUtils.verifyServerSignature(
+			serverPublicKey,
+			consentData,
+			result.serverSignature
+		);
+
+		if (isValid) {
+			console.log('✅ Server signature is valid and verified.');
+		} else {
+			console.warn('❌ Server signature verification failed.');
+		}
 
 		if (result.success) {
 			console.log('Consent successfully processed by server');
