@@ -1,17 +1,8 @@
-// Browser extension implementation for consent cryptographic flow with RSA
-console.log("Content script loaded - Consent Cryptographic Handler");
+// Browser extension implementation for consent cryptographic flow with JWS
+console.log("Content script loaded - Consent Cryptographic Handler with JWS");
 
 // Helpers for browser environment
 const cryptoUtils = {
-	// Convert hex string to ArrayBuffer
-	hexToArrayBuffer(hexString) {
-		const bytes = new Uint8Array(hexString.length / 2);
-		for (let i = 0; i < hexString.length; i += 2) {
-			bytes[i / 2] = parseInt(hexString.substring(i, i + 2), 16);
-		}
-		return bytes.buffer;
-	},
-
 	// Convert ArrayBuffer to hex string
 	arrayBufferToHex(buffer) {
 		return Array.from(new Uint8Array(buffer))
@@ -24,30 +15,30 @@ const cryptoUtils = {
 		return new TextEncoder().encode(str);
 	},
 
-	// Convert ArrayBuffer to string
-	arrayBufferToString(buffer) {
-		return new TextDecoder().decode(buffer);
+	hexToArrayBuffer(hex) {
+		const bytes = new Uint8Array(hex.length / 2);
+		for (let i = 0; i < hex.length; i += 2) {
+			bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+		}
+		return bytes.buffer;
 	},
 
-	// Generate random symmetric key (32 bytes for AES-256)
-	generateRandomSymmetricKey() {
-		return window.crypto.getRandomValues(new Uint8Array(32));
+	// Base64 URL encoding (without padding)
+	base64UrlEncode(buffer) {
+		const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+		return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 	},
 
-	// Import raw bytes as AES key
-	async importSymmetricKey(keyBytes) {
-		return window.crypto.subtle.importKey(
-			'raw',
-			keyBytes,
-			{ name: 'AES-GCM', length: 256 },
-			false,
-			['encrypt', 'decrypt']
-		);
+	// Base64 URL decoding
+	base64UrlDecode(str) {
+		// Add padding if needed
+		str += '='.repeat((4 - str.length % 4) % 4);
+		str = str.replace(/-/g, '+').replace(/_/g, '/');
+		return Uint8Array.from(atob(str), c => c.charCodeAt(0));
 	},
 
 	// Import RSA public key from PEM format
 	async importRSAPublicKey(pemKey) {
-		// Remove header, footer, and whitespace from PEM
 		const pemHeader = "-----BEGIN PUBLIC KEY-----";
 		const pemFooter = "-----END PUBLIC KEY-----";
 		const pemContents = pemKey
@@ -55,90 +46,22 @@ const cryptoUtils = {
 			.replace(pemFooter, '')
 			.replace(/\s/g, '');
 
-		// Convert base64 to ArrayBuffer
 		const binaryString = atob(pemContents);
 		const bytes = new Uint8Array(binaryString.length);
 		for (let i = 0; i < binaryString.length; i++) {
 			bytes[i] = binaryString.charCodeAt(i);
 		}
 
-		// Import the key
 		return window.crypto.subtle.importKey(
 			'spki',
 			bytes.buffer,
 			{
-				name: 'RSA-OAEP',
+				name: 'RSA-PSS',
 				hash: { name: 'SHA-256' }
 			},
 			false,
-			['encrypt']
+			['verify']
 		);
-	},
-
-	// Encrypt symmetric key with RSA public key
-	async encryptSymmetricKey(publicKey, symmetricKey) {
-		const encryptedKey = await window.crypto.subtle.encrypt(
-			{
-				name: 'RSA-OAEP'
-			},
-			publicKey,
-			symmetricKey
-		);
-
-		return this.arrayBufferToHex(encryptedKey);
-	},
-
-	// Encrypt consent data
-	async encryptConsent(symmetricKey, consentData) {
-		// Generate random IV
-		const iv = window.crypto.getRandomValues(new Uint8Array(12));
-
-		// Convert consent data to JSON string and then to bytes
-		const consentBytes = new TextEncoder().encode(JSON.stringify(consentData));
-
-		// Encrypt
-		const encryptedContent = await window.crypto.subtle.encrypt(
-			{
-				name: 'AES-GCM',
-				iv: iv,
-				tagLength: 128 // 16 bytes tag
-			},
-			symmetricKey,
-			consentBytes
-		);
-
-		// In AES-GCM the auth tag is appended to the ciphertext
-		// We need to extract it to match our protocol
-		const encryptedBytes = new Uint8Array(encryptedContent);
-		const ciphertextLength = encryptedBytes.length - 16; // 16 bytes tag
-		const ciphertext = new Uint8Array(encryptedBytes.buffer, 0, ciphertextLength);
-		const tag = new Uint8Array(encryptedBytes.buffer, ciphertextLength, 16);
-
-		return {
-			ciphertext: this.arrayBufferToHex(ciphertext),
-			iv: this.arrayBufferToHex(iv),
-			tag: this.arrayBufferToHex(tag)
-		};
-	},
-
-	// Sign data with RSA-PSS
-	async signData(privateKey, data) {
-		// Convert data to ArrayBuffer if it's not already
-		const dataBuffer = typeof data === 'string'
-			? this.stringToArrayBuffer(data)
-			: data;
-
-		// Sign
-		const signature = await window.crypto.subtle.sign(
-			{
-				name: 'RSA-PSS',
-				saltLength: 32 // max salt length
-			},
-			privateKey,
-			dataBuffer
-		);
-
-		return this.arrayBufferToHex(signature);
 	},
 
 	// Generate RSA key pair for signing
@@ -163,12 +86,64 @@ const cryptoUtils = {
 		const pemFooter = "-----END PUBLIC KEY-----";
 		const pemBody = exportedAsBase64.match(/.{1,64}/g).join('\n');
 		return `${pemHeader}\n${pemBody}\n${pemFooter}`;
+	},
+
+	// Sign data using RSA-PSS private key
+	async signData(privateKey, data) {
+		const dataBuffer = this.stringToArrayBuffer(JSON.stringify(data));
+
+		const signature = await window.crypto.subtle.sign(
+			{
+				name: 'RSA-PSS',
+				saltLength: 32 //  if you use SHA-256 as the digest algorithm, this could be 32.
+			},
+			privateKey,
+			dataBuffer
+		);
+
+		return this.base64UrlEncode(signature);
+	},
+
+	// Verify server-signed JWS
+	async verifyServerJWS(jwsJsonString, consent, serverPublicKey) {
+
+		const jws = JSON.parse(jwsJsonString);
+
+		if (!jws.payload || !Array.isArray(jws.signatures)) {
+			throw new Error('Invalid JWS JSON serialization format');
+		}
+
+		// Choose the server signature (e.g., the second one)
+		const serverSigEntry = jws.signatures[1];
+		if (!serverSigEntry || !serverSigEntry.signature || !serverSigEntry.header) {
+			throw new Error('Missing server signature entry');
+		}
+
+		const payloadBytes = this.base64UrlDecode(jws.payload);
+
+		const isValid = await window.crypto.subtle.verify(
+			{
+				name: "RSA-PSS",
+				saltLength: 32
+			},
+			serverPublicKey,
+			this.base64UrlDecode(serverSigEntry.signature),
+			this.stringToArrayBuffer(JSON.stringify(consent))
+		);
+
+		if (!isValid) {
+			throw new Error('Invalid server signature');
+		}
+
+		// Decode and return payload
+		const payloadBuffer = this.base64UrlDecode(jws.payload);
+		return JSON.parse(new TextDecoder().decode(payloadBuffer));
 	}
 };
 
-// Consent processing with RSA key exchange
+// Consent processing with JWS
 async function processConsent(consentData) {
-	console.log('Processing consent data with RSA:', consentData);
+	console.log('Processing consent data with JWS:', consentData);
 
 	try {
 		// Step 1: Fetch server's RSA public key
@@ -178,61 +153,56 @@ async function processConsent(consentData) {
 		console.log('Received server public key data:', publicKeyData);
 
 		// Step 2: Import server's RSA public key
-		const serverPublicKey = await cryptoUtils.importRSAPublicKey(publicKeyData.publicKey);
+		const serverPublicKey = await cryptoUtils.importRSAPublicKey(publicKeyData);
 		console.log('Imported server RSA public key');
 
-		// Step 3: Generate random symmetric key
-		const symmetricKeyBytes = cryptoUtils.generateRandomSymmetricKey();
-		const symmetricKey = await cryptoUtils.importSymmetricKey(symmetricKeyBytes);
-		console.log('Generated random symmetric key');
-
-		// Step 4: Encrypt symmetric key with server's RSA public key
-		const encryptedSymmetricKey = await cryptoUtils.encryptSymmetricKey(serverPublicKey, symmetricKeyBytes);
-		console.log('Encrypted symmetric key with server public key');
-
-		// Step 5: Generate RSA signing key pair for client
+		// Step 3: Generate RSA signing key pair for client
 		const clientSigningKeyPair = await cryptoUtils.generateRSASigningKeyPair();
 		const clientPublicSigningKeyExported = await cryptoUtils.exportPublicKey(
 			clientSigningKeyPair.publicKey
 		);
 		console.log('Generated client RSA signing keys');
 
-		// Step 6: Encrypt consent data with symmetric key
-		const encryptedConsent = await cryptoUtils.encryptConsent(symmetricKey, consentData);
-		console.log('Encrypted consent:', encryptedConsent);
+		// Step 4: Sign consentData
+		const clientSignature = await cryptoUtils.signData(clientSigningKeyPair.privateKey, consentData);
 
-		// Step 7: Sign encrypted consent
-		const dataToSign = encryptedConsent.iv + encryptedConsent.ciphertext + encryptedConsent.tag;
-		const clientSignature = await cryptoUtils.signData(
-			clientSigningKeyPair.privateKey,
-			cryptoUtils.stringToArrayBuffer(dataToSign)
-		);
-		console.log('Signed consent');
-
-		// Step 8: Send package to server
-		const consentPackage = {
-			encryptedConsent: encryptedConsent,
-			encryptedSymmetricKey: encryptedSymmetricKey,
-			clientSignature: clientSignature,
-			clientPublicSigningKey: clientPublicSigningKeyExported
-		};
-
-		console.log('Sending consent package to server:', consentPackage);
+		console.log('Client signed the consent');
 
 		const response = await fetch('http://127.0.0.1:3000/api/consent', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify(consentPackage)
+			body: JSON.stringify({
+				signature: clientSignature,
+				consent: consentData,
+				pubkey: clientPublicSigningKeyExported
+			})
 		});
+
+		console.log('Client sent the info');
 
 		const result = await response.json();
 
-		if (result.success) {
-			console.log('Consent successfully processed by server');
-			console.log('Server signature:', result.serverSignature);
-			return true;
+		console.log(result);
+
+		// Step 5: Verify server-signed JWS
+		if (result.success && result.serverSignedJWS) {
+			try {
+				const serverSignedPayload = await cryptoUtils.verifyServerJWS(
+					result.serverSignedJWS,
+					consentData,
+					serverPublicKey
+				);
+
+				console.log('✅ Server-signed JWS verified successfully');
+				console.log('Final payload:', serverSignedPayload);
+
+				return true;
+			} catch (verifyError) {
+				console.error('❌ Server JWS verification failed:', verifyError);
+				return false;
+			}
 		} else {
 			console.error('Server error:', result.error);
 			return false;
@@ -358,4 +328,4 @@ document.addEventListener('consentUpdated', function(event) {
 });
 
 // Log that the extension is ready
-console.log("Consent Cryptographic Handler ready");
+console.log("Consent Cryptographic Handler with JWS ready");
