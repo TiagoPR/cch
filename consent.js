@@ -88,66 +88,38 @@ const cryptoUtils = {
 		return `${pemHeader}\n${pemBody}\n${pemFooter}`;
 	},
 
-	// Create JWS with client signature
-	async createClientJWS(consentData, clientPrivateKey, clientPublicKeyPem) {
-		// JWS Header
-		const header = {
-			alg: "PS256", // RSA-PSS with SHA-256
-			typ: "JWT",
-			kid: "client-key"
-		};
+	// Sign data using RSA-PSS private key
+	async signData(privateKey, data) {
+		const dataBuffer = this.stringToArrayBuffer(JSON.stringify(data));
 
-		// JWS Payload - contains consent data and client public key
-		const payload = {
-			consentData: consentData,
-			clientPublicKey: clientPublicKeyPem,
-			iat: Math.floor(Date.now() / 1000),
-			iss: "consent-client"
-		};
-
-		// Encode header and payload
-		const encodedHeader = this.base64UrlEncode(this.stringToArrayBuffer(JSON.stringify(header)));
-		const encodedPayload = this.base64UrlEncode(this.stringToArrayBuffer(JSON.stringify(payload)));
-
-		// Create signing input
-		const signingInput = `${encodedHeader}.${encodedPayload}`;
-
-		// Sign with client private key
 		const signature = await window.crypto.subtle.sign(
 			{
 				name: 'RSA-PSS',
-				saltLength: 32
+				saltLength: 32 //  if you use SHA-256 as the digest algorithm, this could be 32.
 			},
-			clientPrivateKey,
-			this.stringToArrayBuffer(signingInput)
+			privateKey,
+			dataBuffer
 		);
 
-		const encodedSignature = this.base64UrlEncode(signature);
-
-		// Return complete JWS
-		return `${signingInput}.${encodedSignature}`;
+		return this.base64UrlEncode(signature);
 	},
 
 	// Verify server-signed JWS
-	async verifyServerJWS(jws, serverPublicKey) {
-		const parts = jws.split('.');
-		if (parts.length !== 3) {
-			throw new Error('Invalid JWS format');
+	async verifyServerJWS(jwsJsonString, consent, serverPublicKey) {
+
+		const jws = JSON.parse(jwsJsonString);
+
+		if (!jws.payload || !Array.isArray(jws.signatures)) {
+			throw new Error('Invalid JWS JSON serialization format');
 		}
 
-		const [encodedHeader, encodedPayload, encodedSignature] = parts;
-
-		// Decode header to check if it's server-signed
-		const headerBuffer = this.base64UrlDecode(encodedHeader);
-		const header = JSON.parse(new TextDecoder().decode(headerBuffer));
-
-		if (header.kid !== "server-key") {
-			throw new Error('JWS not signed by server');
+		// Choose the server signature (e.g., the second one)
+		const serverSigEntry = jws.signatures[1];
+		if (!serverSigEntry || !serverSigEntry.signature || !serverSigEntry.header) {
+			throw new Error('Missing server signature entry');
 		}
 
-		// Verify server signature
-		const signingInput = `${encodedHeader}.${encodedPayload}`;
-		const signatureBuffer = this.base64UrlDecode(encodedSignature);
+		const payloadBytes = this.base64UrlDecode(jws.payload);
 
 		const isValid = await window.crypto.subtle.verify(
 			{
@@ -155,8 +127,8 @@ const cryptoUtils = {
 				saltLength: 32
 			},
 			serverPublicKey,
-			signatureBuffer,
-			this.stringToArrayBuffer(signingInput)
+			this.base64UrlDecode(serverSigEntry.signature),
+			this.stringToArrayBuffer(JSON.stringify(consent))
 		);
 
 		if (!isValid) {
@@ -164,51 +136,8 @@ const cryptoUtils = {
 		}
 
 		// Decode and return payload
-		const payloadBuffer = this.base64UrlDecode(encodedPayload);
+		const payloadBuffer = this.base64UrlDecode(jws.payload);
 		return JSON.parse(new TextDecoder().decode(payloadBuffer));
-	},
-
-	// Pretty print JWS token with decoded header and payload
-	logJWSToken(jws, title = 'JWS Token') {
-		console.log(`\n🔍 ${title}:`);
-		console.log('─'.repeat(50));
-
-		// Print the raw JWS token
-		console.log('📄 Raw JWS Token:');
-		console.log(jws);
-		console.log('');
-
-		try {
-			const parts = jws.split('.');
-			if (parts.length !== 3) {
-				console.log('❌ Invalid JWS format');
-				return;
-			}
-
-			const [encodedHeader, encodedPayload, encodedSignature] = parts;
-
-			// Decode and display header
-			const headerBuffer = this.base64UrlDecode(encodedHeader);
-			const header = JSON.parse(new TextDecoder().decode(headerBuffer));
-			console.log('📋 Header:');
-			console.log(JSON.stringify(header, null, 2));
-
-			// Decode and display payload
-			const payloadBuffer = this.base64UrlDecode(encodedPayload);
-			const payload = JSON.parse(new TextDecoder().decode(payloadBuffer));
-			console.log('📦 Payload:');
-			console.log(JSON.stringify(payload, null, 2));
-
-			// Display signature info
-			console.log('🔐 Signature:');
-			console.log(`Length: ${encodedSignature.length} characters`);
-			console.log(`Preview: ${encodedSignature.substring(0, 50)}...`);
-
-		} catch (error) {
-			console.error('❌ Error decoding JWS:', error.message);
-		}
-
-		console.log('─'.repeat(50));
 	}
 };
 
@@ -234,38 +163,35 @@ async function processConsent(consentData) {
 		);
 		console.log('Generated client RSA signing keys');
 
-		// Step 4: Create client-signed JWS
-		const clientJWS = await cryptoUtils.createClientJWS(
-			consentData,
-			clientSigningKeyPair.privateKey,
-			clientPublicSigningKeyExported
-		);
-		console.log('Created client JWS');
+		// Step 4: Sign consentData
+		const clientSignature = await cryptoUtils.signData(clientSigningKeyPair.privateKey, consentData);
 
-		// Log the client JWS
-		cryptoUtils.logJWSToken(clientJWS, 'Client-Generated JWS');
-
-		// Step 5: Send JWS to server
-		console.log('Sending JWS to server');
+		console.log('Client signed the consent');
 
 		const response = await fetch('http://127.0.0.1:3000/api/consent', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({ jws: clientJWS })
+			body: JSON.stringify({
+				signature: clientSignature,
+				consent: consentData,
+				pubkey: clientPublicSigningKeyExported
+			})
 		});
+
+		console.log('Client sent the info');
 
 		const result = await response.json();
 
-		// Step 6: Verify server-signed JWS
-		if (result.success && result.serverSignedJWS) {
-			// Log the server-signed JWS
-			cryptoUtils.logJWSToken(result.serverSignedJWS, 'Server-Signed JWS');
+		console.log(result);
 
+		// Step 5: Verify server-signed JWS
+		if (result.success && result.serverSignedJWS) {
 			try {
 				const serverSignedPayload = await cryptoUtils.verifyServerJWS(
 					result.serverSignedJWS,
+					consentData,
 					serverPublicKey
 				);
 
