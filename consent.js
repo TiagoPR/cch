@@ -119,8 +119,6 @@ const cryptoUtils = {
 			throw new Error('Missing server signature entry');
 		}
 
-		const payloadBytes = this.base64UrlDecode(jws.payload);
-
 		const isValid = await window.crypto.subtle.verify(
 			{
 				name: "RSA-PSS",
