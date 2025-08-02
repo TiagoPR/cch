@@ -140,7 +140,6 @@ const cryptoUtils = {
 	async signData(privateKey, data) {
 		const dataBuffer = this.stringToArrayBuffer(JSON.stringify(data));
 
-		console.log("Falha aqui?");
 		const signature = await window.crypto.subtle.sign(
 			{
 				name: 'RSA-PSS',
@@ -149,7 +148,6 @@ const cryptoUtils = {
 			privateKey,
 			dataBuffer
 		);
-		console.log("OU aqui?");
 
 		return this.base64UrlEncode(signature);
 	},
