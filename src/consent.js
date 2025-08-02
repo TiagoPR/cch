@@ -1,3 +1,5 @@
+import forge from "node-forge";
+
 // Browser extension implementation for consent cryptographic flow with JWS
 console.log("Content script loaded - Consent Cryptographic Handler with JWS");
 
@@ -64,18 +66,64 @@ const cryptoUtils = {
 		);
 	},
 
-	// Generate RSA key pair for signing
-	async generateRSASigningKeyPair() {
-		return window.crypto.subtle.generateKey(
+	async importPrivateKey(pem) {
+		// Remove PEM header/footer and newlines
+		const pemContents = pem
+			.replace(/-----BEGIN (.*)-----/, '')
+			.replace(/-----END (.*)-----/, '')
+			.replace(/\s+/g, '');
+
+		// Convert base64 to ArrayBuffer
+		const binaryDer = Uint8Array.from(atob(pemContents), c => c.charCodeAt(0));
+
+		// Import key
+		return await crypto.subtle.importKey(
+			'pkcs8',
+			binaryDer.buffer,
 			{
 				name: 'RSA-PSS',
-				modulusLength: 2048,
-				publicExponent: new Uint8Array([0x01, 0x00, 0x01]), // 65537
-				hash: { name: 'SHA-256' }
+				hash: 'SHA-256',
 			},
-			true, // extractable
-			['sign', 'verify']
+			false,
+			['sign']
 		);
+	},
+
+	formatPem(pem, type) {
+		const header = `-----BEGIN ${type}-----`;
+		const footer = `-----END ${type}-----`;
+
+		// Remove headers/footers and whitespace
+		const base64 = pem
+			.replace(/-----.*?-----/g, '')
+			.replace(/\s+/g, '');
+
+		// Rebuild properly formatted PEM
+		const formatted = base64.match(/.{1,64}/g).join('\n');
+		return `${header}\n${formatted}\n${footer}`;
+	},
+
+	// Generate RSA key pair for signing
+	async loadSigningKeyPair() {
+		let certPEM, privKey;
+		try {
+			certPEM = localStorage.getItem("cert");
+			certPEM = this.formatPem(certPEM, "CERTIFICATE")
+			console.log(certPEM);
+
+			privKey = localStorage.getItem("privKey");
+			privKey = this.formatPem(privKey, "PRIVATE KEY")
+			console.log(privKey);
+
+		} catch (e) {
+			console.error("Error getting local storage PEM values:", e);
+			throw e;
+		}
+
+		const cert = forge.pki.certificateFromPem(certPEM);
+		const pubKey = forge.pki.publicKeyToPem(cert.publicKey);
+
+		return { pubKey, privKey };
 	},
 
 	// Export public key to PEM format
@@ -92,6 +140,7 @@ const cryptoUtils = {
 	async signData(privateKey, data) {
 		const dataBuffer = this.stringToArrayBuffer(JSON.stringify(data));
 
+		console.log("Falha aqui?");
 		const signature = await window.crypto.subtle.sign(
 			{
 				name: 'RSA-PSS',
@@ -100,6 +149,7 @@ const cryptoUtils = {
 			privateKey,
 			dataBuffer
 		);
+		console.log("OU aqui?");
 
 		return this.base64UrlEncode(signature);
 	},
@@ -144,25 +194,25 @@ async function processConsent(consentData) {
 	console.log('Processing consent data with JWS:', consentData);
 
 	try {
-		// Step 1: Fetch server's RSA public key
-		const publicKeyResponse = await fetch('http://127.0.0.1:3000/api/publickey');
-		const publicKeyData = await publicKeyResponse.json();
+		// Step 1: Fetch server's certificate and pubKey
+		const serverCert = await fetch('http://127.0.0.1:3000/api/server_certificate');
+		const certPem = await serverCert.json();
+		const cert = forge.pki.certificateFromPem(certPem);
+		const publicKey = forge.pki.publicKeyToPem(cert.publicKey);
 
-		console.log('Received server public key data:', publicKeyData);
+		console.log('Received server public key data:', publicKey);
 
 		// Step 2: Import server's RSA public key
-		const serverPublicKey = await cryptoUtils.importRSAPublicKey(publicKeyData);
+		const serverPublicKey = await cryptoUtils.importRSAPublicKey(publicKey);
 		console.log('Imported server RSA public key');
 
-		// Step 3: Generate RSA signing key pair for client
-		const clientSigningKeyPair = await cryptoUtils.generateRSASigningKeyPair();
-		const clientPublicSigningKeyExported = await cryptoUtils.exportPublicKey(
-			clientSigningKeyPair.publicKey
-		);
-		console.log('Generated client RSA signing keys');
+		// Step 3: Load key pair for client
+		const clientSigningKeyPair = await cryptoUtils.loadSigningKeyPair();
+		const privKeyCrypto = await cryptoUtils.importPrivateKey(clientSigningKeyPair.privKey);
+		console.log('Loaded client RSA signing keys');
 
 		// Step 4: Sign consentData
-		const clientSignature = await cryptoUtils.signData(clientSigningKeyPair.privateKey, consentData);
+		const clientSignature = await cryptoUtils.signData(privKeyCrypto, consentData);
 
 		console.log('Client signed the consent');
 
@@ -174,7 +224,7 @@ async function processConsent(consentData) {
 			body: JSON.stringify({
 				signature: clientSignature,
 				consent: consentData,
-				pubkey: clientPublicSigningKeyExported
+				pubkey: clientSigningKeyPair.pubKey
 			})
 		});
 
