@@ -1,5 +1,35 @@
 import forge from "node-forge";
 
+// Create our own CA Store with our OpenSSL Root CA
+const trustedRootPEM = `-----BEGIN CERTIFICATE-----
+MIIEDzCCAvegAwIBAgIUE/tStnqoWkHevCSZFxP3eVOF/WwwDQYJKoZIhvcNAQEL
+BQAwgZYxCzAJBgNVBAYTAlBUMQ4wDAYDVQQIDAVCcmFnYTEOMAwGA1UEBwwFQnJh
+Z2ExHjAcBgNVBAoMFVVuaXZlcnNpZGFkZSBkbyBNaW5obzEUMBIGA1UECwwLSW5m
+b3JtYXRpY2ExDzANBgNVBAMMBlVNSU5ITzEgMB4GCSqGSIb3DQEJARYRcGc1Mjcw
+NUB1bWluaG8ucHQwHhcNMjUwNzI4MjExMTQ1WhcNMzAwNzI4MjExMTQ1WjCBljEL
+MAkGA1UEBhMCUFQxDjAMBgNVBAgMBUJyYWdhMQ4wDAYDVQQHDAVCcmFnYTEeMBwG
+A1UECgwVVW5pdmVyc2lkYWRlIGRvIE1pbmhvMRQwEgYDVQQLDAtJbmZvcm1hdGlj
+YTEPMA0GA1UEAwwGVU1JTkhPMSAwHgYJKoZIhvcNAQkBFhFwZzUyNzA1QHVtaW5o
+by5wdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAM/dHHZ9mVjbJctf
+KWpkSVImOqqzWfsos8o5Zl31zrHZIIlazRKrdIMRLeaXORN1mqRY6bNeSsnrgTTd
+8Xzgj491gH/Opu907oYH/wLbqNKcjDdFGwWHgIOxKaTyO1669xARrCse9/J3eMIQ
+UGpS3XnVYFitE3io4gVw9fj+rAJ1paYfCD8rdqHy2f6pDOdtdjTgqj2h9rXwBcHd
+2hHZIC+P7iXMP523rU/tEtfc7H0Phv12AMiZdzkuy6xMKGauTK2sqvFQN6PvMFSn
+GGgfYsuDC7AKOmGs99Sq8penOQBjcx2wyxjN9Z0EB3X6FAd3FURE+bFQRiEnvGK0
+6RjkJUECAwEAAaNTMFEwHQYDVR0OBBYEFIsiZW4EHhBqNYVtYnq3Scfx8Nj8MB8G
+A1UdIwQYMBaAFIsiZW4EHhBqNYVtYnq3Scfx8Nj8MA8GA1UdEwEB/wQFMAMBAf8w
+DQYJKoZIhvcNAQELBQADggEBAK08kCZ/XWdBO51QRzVbp6JOVs6NKLZUFC4KrK29
+xJa2RKdBicbehAUstdw92aHNAZsMWjSiP4bwpU2caK9lrmqDg5hEVQ3EITE3rzJM
+Q9wQOp08ldInbmBEiM0bXJCo/q/E+Irx/oSaW79pqBqTtCaSpMm/u0MUHEZ0Nn42
+yFz00tE9m9Wys/DwyHs+DH6oziifnjzEhVsLzcID/uRaiKKKB8Zeha5lxVnaTs5F
+Lk1kEhdg1XHMFSvmz7bvk5W3ZGhmlK9MjzfqXVTM1dZ5InXEEGgEpock/5cQYi/5
+G2JMeDHwT5OKtCOmKPcFWfHe1CIEPnGI2Rj2aVVJZ1Abzu8=
+-----END CERTIFICATE-----`
+
+const rootCert = forge.pki.certificateFromPem(trustedRootPEM);
+
+const caStore = forge.pki.createCaStore([rootCert]);
+
 // Browser extension implementation for consent cryptographic flow with JWS
 console.log("Content script loaded - Consent Cryptographic Handler with JWS");
 
@@ -107,13 +137,65 @@ const cryptoUtils = {
 	async loadSigningKeyPair() {
 		let certPEM, privKey;
 		try {
-			certPEM = localStorage.getItem("cert");
-			certPEM = this.formatPem(certPEM, "CERTIFICATE")
-			console.log(certPEM);
+			//certPEM = localStorage.getItem("cert");
+			//certPEM = this.formatPem(certPEM, "CERTIFICATE")
+			// Testing
+			certPEM = `-----BEGIN CERTIFICATE-----
+MIID+jCCAuKgAwIBAgIUNxdcF0bRmDEFskFJS+vrnAieXb8wDQYJKoZIhvcNAQEL
+BQAwgZYxCzAJBgNVBAYTAlBUMQ4wDAYDVQQIDAVCcmFnYTEOMAwGA1UEBwwFQnJh
+Z2ExHjAcBgNVBAoMFVVuaXZlcnNpZGFkZSBkbyBNaW5obzEUMBIGA1UECwwLSW5m
+b3JtYXRpY2ExDzANBgNVBAMMBlVNSU5ITzEgMB4GCSqGSIb3DQEJARYRcGc1Mjcw
+NUB1bWluaG8ucHQwHhcNMjUwNzI4MjEyNTExWhcNMjcxMDMxMjEyNTExWjCBkjEL
+MAkGA1UEBhMCUFQxDjAMBgNVBAgMBUJyYWdhMQ4wDAYDVQQHDAVCcmFnYTEeMBwG
+A1UECgwVVW5pdmVyc2lkYWRlIGRvIE1pbmhvMRAwDgYDVQQLDAdDbGllbnRlMQ8w
+DQYDVQQDDAZVTUlOSE8xIDAeBgkqhkiG9w0BCQEWEXBnNTI3MDVAdW1pbmhvLnB0
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAotPkYXOKQKyypZXBolba
+gmI1+aRNKq53DBA28qMCt56bJEzm7EoHQUQU69CQKGA6VjwvtSAV5csPFqF0Aqgq
+ALWOYXhDw8E5N7kqAsTBaclBZ0IjlS40syjwQ3JAqWpbdB4IyqaJJ0oA+ZH4MRX+
+3uXSjj25qExFty/OCDLKuVUQkd11Nr7v2TLsi/aN4AjAjJLfmwXBycZqmj9Klca0
+UfQB5gbaD/nvBbRjaiNf9xeXlbQsL3dWR1eNDX7acWNXfCS2DnfSW0sXvOjMwj62
+F7SiR0C0yog3N+cegyX6R61LBmdQNZ1xE21/xXHK60xGrjt3AVmqSSBk8rOiLi99
+dwIDAQABo0IwQDAdBgNVHQ4EFgQUVUBLAGdqSbDMb5089bFobujXTy4wHwYDVR0j
+BBgwFoAUiyJlbgQeEGo1hW1ierdJx/Hw2PwwDQYJKoZIhvcNAQELBQADggEBAGRx
+0iCLuJVBMzhoggzVtVwKazuS7MOHMXKi2UhAm6Tg4jJo9N/30ytVidQuaD/S23RV
+PZ0IECTOqjlljXzkxcdiYkqyQXbTvLJeCfNAkEh0Fu3HWBuQDZarqPU+u5300HPP
+hdWBqD0Z+pnxRD0+nH+J+tT8vdNzYP0RDTM8ARJnEy7L5bo9Ou6KZcW6hWytup+0
+Kcvtcq2GcxV0JYWMsI5gZ5NbnF1PlDqpcDQzGjKVdL1TErA7A7FoskEQPWmoSuN6
+7arTriGaVsHHAsmh+k7daJDHrvD84zK1vt36fIt7NKZzdsmdqZhqxctIQ1MBmlrm
+9u9FQI7orWELDzjndiE=
+-----END CERTIFICATE-----`
 
-			privKey = localStorage.getItem("privKey");
-			privKey = this.formatPem(privKey, "PRIVATE KEY")
-			console.log(privKey);
+			//privKey = localStorage.getItem("privKey");
+			//privKey = this.formatPem(privKey, "PRIVATE KEY")
+			// Testing
+			privKey = `-----BEGIN PRIVATE KEY-----
+MIIEuwIBADANBgkqhkiG9w0BAQEFAASCBKUwggShAgEAAoIBAQCi0+Rhc4pArLKl
+lcGiVtqCYjX5pE0qrncMEDbyowK3npskTObsSgdBRBTr0JAoYDpWPC+1IBXlyw8W
+oXQCqCoAtY5heEPDwTk3uSoCxMFpyUFnQiOVLjSzKPBDckCpalt0HgjKpoknSgD5
+kfgxFf7e5dKOPbmoTEW3L84IMsq5VRCR3XU2vu/ZMuyL9o3gCMCMkt+bBcHJxmqa
+P0qVxrRR9AHmBtoP+e8FtGNqI1/3F5eVtCwvd1ZHV40NftpxY1d8JLYOd9JbSxe8
+6MzCPrYXtKJHQLTKiDc35x6DJfpHrUsGZ1A1nXETbX/FccrrTEauO3cBWapJIGTy
+s6IuL313AgMBAAECgf9N5A8LhabkSVn83ApOc5M5pgPpkqELlbXFcxiwDEq2/ahf
+ZH04877/+ak30AP2jvVZJVUCZ9biZt098W/eIVrZ+//sODgycUEFfrjqo5zr00xL
+hhDxR2bbagqhx0OPtJg6fVMDLGTrFfIojWQxpTxLucF2B2/W8T1L5EtQ7Ilsc3xc
+FKD7YchqwwZ7yZnMrUd7atBWA3VZ6E1fmXHlHZJbGzsAT1GKgc7um92BTK2fuYWs
+iTs7eNdt+cbebRrgxCFsTFSbxbmpdYxdlym3WNUtwnACaGapZZymHQHzx6tquCP/
+y2QQtBjc6t1soxf9N6voGGjZNcrgdbHTGz1RovkCgYEA2YXWg0rO8hVfCPyM3UNa
+0WkanUGLCeydb8vrHeA8BY67La0aCc5uJOVHewhOeON1qsDwD6zD5St6+3jgMq5k
+hF7do65tOz+HBZl0TdbKkHlANRDTY/HUAP8ftsyWhzgSvg9bw0zCMuLKfSdv+vG/
+JZeXaQy6nsDqzV8/JX6+Y7kCgYEAv6FGzfGk6vIIioOIU/yba5Llns41HmJWaoVy
+ZqwV/39WL3kaInFfAWEXlc3rIIepITnp+cRlKtv7flssUS+eYEmO0P4oKkXFBmNZ
+TJyTycelCaBHN520OHLg+d4GlNT0oOjHr7vK1pMqhxwCWvTp2y/TgxklqQ/A4c+k
+RyYA4q8CgYBdWxqQqKeesFtkQPe38rNkksZQXZPtw3ZiR9N1tAounG5rERLOyKDv
+BtQh0pPTQFP83+dn4s8EaR/UE7GtLrmHMivPlwncVsx9M7n9ukSfstpCrCD9kQlb
+ECOtUar9B6zLk03fyO7D5h/fjPB7dAuEd8YM2OCzR7q+P7WbQwU1SQKBgQC+/te7
+XCWrpiCtLfwq+ZNO3NLQPWbkKc9HzEoB23LxfNFB78oEmkq+7S68uMipW41O+JIj
+x4Ot/CPmBKlfIb8Q6T/XPfp6Z5/AhjTzDvyeGMZ9maph3GVL/fQOFyUoIjjQSDL/
+DIVW6MdycpBGZ+TN+hUujVnj7zen2XU7FL29MQKBgFErX7A0hN9wMUXNnNzsGcnD
+ogFwAJQrWZco6aO97e6SwEzeAWG2h+PWSCHbwsfrOhtRPaTCpSTFb+Vbf5UOHt3u
+42X+atnAvhyZoVslYSRVxr8iWMxt7Q7w1p1gOooQ/4HvXKGVnzMEo2GW3DQzYjsR
+eaPEeqOv+vuJ4LH+H39w
+-----END PRIVATE KEY-----`
 
 		} catch (e) {
 			console.error("Error getting local storage PEM values:", e);
@@ -133,7 +215,7 @@ const cryptoUtils = {
 		const pemHeader = "-----BEGIN PUBLIC KEY-----";
 		const pemFooter = "-----END PUBLIC KEY-----";
 		const pemBody = exportedAsBase64.match(/.{1,64}/g).join('\n');
-		return `${pemHeader}\n${pemBody}\n${pemFooter}`;
+		return `${pemHeader} \n${pemBody} \n${pemFooter} `;
 	},
 
 	// Sign data using RSA-PSS private key
@@ -196,6 +278,13 @@ async function processConsent(consentData) {
 		const serverCert = await fetch('http://127.0.0.1:3000/api/server_certificate');
 		const certPem = await serverCert.json();
 		const cert = forge.pki.certificateFromPem(certPem);
+
+		try {
+			forge.pki.verifyCertificateChain(caStore, [cert]);
+			console.log("✅ Server certificate is trusted (signed by root CA)");
+		} catch (e) {
+			console.error("❌ Certificate chain not trusted:", e.message);
+		}
 		const publicKey = forge.pki.publicKeyToPem(cert.publicKey);
 
 		console.log('Received server public key data:', publicKey);
