@@ -392,15 +392,21 @@ document.addEventListener('click', function(event) {
 			}
 		}, 100);
 	}
-	else if (event.target.closest('.cm-btn-decline')) {
+	else if (event.target.closest('.cn-decline')) {
 		console.log("✅ User submitted negative consent");
 
 		// Similar processing for declined consent
 		setTimeout(() => {
-			const manager = window.klaro?.getManager();
-			if (manager) {
+			const cookieString = document.cookie
+				.split('; ')
+				.find(row => row.startsWith('klaro='));
+
+			if (cookieString) {
+				const klaroValue = decodeURIComponent(cookieString.split('=')[1]);
+				const consentObject = JSON.parse(klaroValue);
+
 				const consentData = {
-					consents: manager.consents,
+					consents: consentObject,
 					confirmed: false,
 					timestamp: new Date().toISOString()
 				};
